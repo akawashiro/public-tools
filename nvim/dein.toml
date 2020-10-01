@@ -1,0 +1,141 @@
+[[plugins]]
+repo = 'pboettch/vim-cmake-syntax'
+
+[[plugins]]
+repo = 'scrooloose/nerdtree'
+hook_add = '''
+    nnoremap <silent><C-e> :NERDTreeToggle<CR>
+'''
+
+[[plugins]]
+repo = 'rhysd/vim-clang-format'
+hook_add = '''
+    let g:clang_format#detect_style_file = 1
+    let g:clang_format#auto_format = 1
+'''
+
+[[plugins]]
+repo = 'vim-airline/vim-airline-themes'
+
+[[plugins]]
+repo = 'cespare/vim-toml'
+
+[[plugins]]
+repo = 'tyru/caw.vim.git'
+hook_add = '''
+    nmap <C-c> <Plug>(caw:hatpos:toggle)
+    vmap <C-c> <Plug>(caw:hatpos:toggle)
+'''
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
+repo = 'dhruvasagar/vim-table-mode'
+
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+
+[[plugins]]
+repo = 'deoplete-plugins/deoplete-clang'
+hook_add = '''
+    let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
+'''
+depends = ['deoplete.nvim']
+
+[[plugins]]
+repo = 'Shougo/neoinclude.vim'
+on_ft = ['c', 'cpp']
+depends = ['deoplete.nvim']
+
+[[plugins]]
+repo = 'lyuts/vim-rtags'
+on_ft = ['c', 'cpp']
+hook_add = '''
+    let g:rtagsUseDefaultMappings = 0
+    let g:rtagsAutoLaunchRdm = 1
+'''
+hook_source = '''
+    noremap <Leader>ri :call rtags#SymbolInfo()<CR>
+    noremap <Leader>rj :call rtags#JumpTo(g:SAME_WINDOW)<CR>
+    noremap <Leader>rJ :call rtags#JumpTo(g:SAME_WINDOW, { '--declaration-only' : '' })<CR>
+    noremap <Leader>rS :call rtags#JumpTo(g:H_SPLIT)<CR>
+    noremap <Leader>rV :call rtags#JumpTo(g:V_SPLIT)<CR>
+    noremap <Leader>rT :call rtags#JumpTo(g:NEW_TAB)<CR>
+    noremap <Leader>rp :call rtags#JumpToParent()<CR>
+    noremap <Leader>rf :call rtags#FindRefs()<CR>
+    noremap <Leader>rF :call rtags#FindRefsCallTree()<CR>
+    noremap <Leader>rn :call rtags#FindRefsByName(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))<CR>
+    noremap <Leader>rs :call rtags#FindSymbols(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))<CR>
+    noremap <Leader>rr :call rtags#ReindexFile()<CR>
+    noremap <Leader>rl :call rtags#ProjectList()<CR>
+    noremap <Leader>rw :call rtags#RenameSymbolUnderCursor()<CR>
+    noremap <Leader>rv :call rtags#FindVirtuals()<CR>
+    noremap <Leader>rb :call rtags#JumpBack()<CR>
+    noremap <Leader>rC :call rtags#FindSuperClasses()<CR>
+    noremap <Leader>rc :call rtags#FindSubClasses()<CR>
+    noremap <Leader>rd :call rtags#Diagnostics()<CR>
+'''
+
+[[plugins]]
+repo = 'w0rp/ale'
+hook_add = '''
+    let g:ale_sign_column_always = 1
+    let g:ale_fix_on_save = 1
+    let g:ale_completion_enabled = 1
+
+    let g:ale_sign_error = '⨉'
+    let g:ale_sign_warning = '⚠'
+
+    let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+    let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
+    let g:ale_linters = {
+        \   'c' : ['clangd'],
+        \   'cpp' : ['clangd']
+    \}
+'''
+
+[[plugins]]
+repo = 'vim-airline/vim-airline'
+hook_add = '''
+    " Use powerline-style font
+    set laststatus=2
+    let g:airline_powerline_fonts = 1
+    let g:airline#extensions#tabline#enabled = 1
+    let g:airline#extensions#tabline#buffer_idx_mode = 1
+    let g:airline#extensions#whitespace#mixed_indent_algo = 1
+    let g:airline_theme = 'tomorrow'
+    if !exists('g:airline_symbols')
+      let g:airline_symbols = {}
+    endif
+    
+    " unicode symbols
+    let g:airline_left_sep = '»'
+    let g:airline_left_sep = '▶'
+    let g:airline_right_sep = '«'
+    let g:airline_right_sep = '◀'
+    let g:airline_symbols.crypt = '🔒'
+    let g:airline_symbols.linenr = '☰'
+    let g:airline_symbols.linenr = '␊'
+    let g:airline_symbols.linenr = '␤'
+    let g:airline_symbols.linenr = '¶'
+    let g:airline_symbols.maxlinenr = ''
+    let g:airline_symbols.maxlinenr = '㏑'
+    let g:airline_symbols.branch = '⎇'
+    let g:airline_symbols.paste = 'ρ'
+    let g:airline_symbols.paste = 'Þ'
+    let g:airline_symbols.paste = '∥'
+    let g:airline_symbols.spell = 'Ꞩ'
+    let g:airline_symbols.notexists = '∄'
+    let g:airline_symbols.whitespace = 'Ξ'
+    
+    " powerline symbols
+    let g:airline_left_sep = ''
+    let g:airline_left_alt_sep = ''
+    let g:airline_right_sep = ''
+    let g:airline_right_alt_sep = ''
+    let g:airline_symbols.branch = ''
+    let g:airline_symbols.readonly = ''
+    let g:airline_symbols.linenr = '☰'
+    let g:airline_symbols.maxlinenr = ''
+'''
