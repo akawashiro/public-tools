@@ -1,6 +1,6 @@
 ########################################
 # Environment variables
-export LANG=ja_JP.UTF-8
+export LANG=en_US.UTF-8
 
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
@@ -266,9 +266,3 @@ if [ -S "$SSH_AUTH_SOCK" ]; then
 fi
 
 eval $(ssh-agent)
-
-
-export PFKUBE_DOCKER_ALLOWED_RUNTIME_UID=2548
-export PFKUBE_MNJ_DEFAULT_DOCKER_REGISTRY=harbor.mnj.pfn.io/user-akirakawata  # This is used when --target-cluster=mnj
-export PFKUBE_MNJ_DEFAULT_DOCKER_CRED_NAME=pfkube-harbor-cred  # This is used when --target-cluster=mnj
-export PFKUBE_MNJ_DEFAULT_GIT_SECRET_NAME=pfkube-git-secret  # This is used when --target-cluster=mnj
