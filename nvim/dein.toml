@@ -17,7 +17,7 @@ depends = ['nerdtree']
 [[plugins]]
 repo = 'preservim/tagbar'
 hook_add = '''
-    map <C-t> <plug>TagbarToggle<CR>
+    nmap <C-t> :TagbarToggle<CR>
 '''
 
 [[plugins]]
