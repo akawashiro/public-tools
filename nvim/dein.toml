@@ -11,10 +11,6 @@ hook_add = '''
 repo = 'jistr/vim-nerdtree-tabs'
 hook_add = '''
     map <C-e> <plug>NERDTreeTabsToggle<CR>
-    function! s:MoveCursorAtStart()
-        call feedkeys("\<C-l>")
-    endfunction
-    autocmd VimEnter * NERDTree | call s:MoveCursorAtStart()
 '''
 depends = ['nerdtree']
 
