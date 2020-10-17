@@ -4,8 +4,28 @@ repo = 'pboettch/vim-cmake-syntax'
 [[plugins]]
 repo = 'scrooloose/nerdtree'
 hook_add = '''
-    nnoremap <silent><C-e> :NERDTreeToggle<CR>
+    let NERDTreeShowHidden = 1
 '''
+
+[[plugins]]
+repo = 'jistr/vim-nerdtree-tabs'
+hook_add = '''
+    map <C-e> <plug>NERDTreeTabsToggle<CR>
+    function! s:MoveCursorAtStart()
+        call feedkeys("\<C-l>")
+    endfunction
+    autocmd VimEnter * NERDTree | call s:MoveCursorAtStart()
+'''
+depends = ['nerdtree']
+
+[[plugins]]
+repo = 'preservim/tagbar'
+hook_add = '''
+    map <C-t> <plug>TagbarToggle<CR>
+'''
+
+[[plugins]]
+repo = 'airblade/vim-gitgutter'
 
 [[plugins]]
 repo = 'rhysd/vim-clang-format'
