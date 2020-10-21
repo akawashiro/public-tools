@@ -25,12 +25,6 @@ export CCACHE_TEMPDIR=$HOME/.ccache
 export OCAMLPARAM="_,bin-annot=1"
 export OPAMKEEPBUILDDIR=1
 
-# export USE_CCACHE=1
-# export CCACHE_DIR=$HOME/.ccache
-# export set CC='ccache gcc'
-# export set CXX='ccache g++'
-
-
 # tmux auto rename
 
 function tnew(){
@@ -266,3 +260,5 @@ if [ -S "$SSH_AUTH_SOCK" ]; then
 fi
 
 eval $(ssh-agent)
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
