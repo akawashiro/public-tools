@@ -1,4 +1,18 @@
 [[plugins]]
+repo = 'junegunn/fzf'
+build = './install --all'
+
+[[plugins]]
+repo = 'junegunn/fzf.vim'
+depends = [ 'junegunn/fzf' ]
+hook_add = '''
+    noremap <Leader>ff :Files<CR>
+    noremap <Leader>fgf :GFiles<CR>
+    noremap <Leader>fa :Ag<CR>
+    noremap <Leader>fb :Buffers<CR>
+'''
+
+[[plugins]]
 repo = 'pboettch/vim-cmake-syntax'
 
 [[plugins]]
