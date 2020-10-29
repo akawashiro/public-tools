@@ -1,4 +1,11 @@
 [[plugins]]
+repo = 'vim-scripts/a.vim'
+on_ft = ['c', 'cpp']
+hook_source = '''
+    nmap <silent> <leader>aa :A<CR>
+'''
+
+[[plugins]]
 repo = 'junegunn/fzf'
 build = './install --all'
 
