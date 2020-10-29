@@ -70,3 +70,5 @@ map <silent> td :bdelete<CR>
 set completeopt=menuone
 
 " ========== nvim end ==========
+
+let g:deoplete#enable_at_startup = 1
