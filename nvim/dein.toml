@@ -32,6 +32,7 @@ hook_add = '''
 repo = 'jistr/vim-nerdtree-tabs'
 hook_add = '''
     map <C-e> <plug>NERDTreeTabsToggle<CR>
+    map <C-w> <plug>NERDTreeFind<CR>
 '''
 depends = ['nerdtree']
 
