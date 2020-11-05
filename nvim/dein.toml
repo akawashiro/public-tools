@@ -1,4 +1,7 @@
 [[plugins]]
+repo = 'vim-scripts/AnsiEsc.vim'
+
+[[plugins]]
 repo = 'vim-scripts/a.vim'
 on_ft = ['c', 'cpp']
 hook_source = '''
