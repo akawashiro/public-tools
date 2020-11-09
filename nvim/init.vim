@@ -71,4 +71,17 @@ set completeopt=menuone
 
 " ========== nvim end ==========
 
+" ========== deoplete start ==========
+
 let g:deoplete#enable_at_startup = 1
+
+" ========== deoplete end ==========
+
+" ========== fzf start ==========
+
+command! -bang -nargs=* GGrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number -- '.shellescape(<q-args>), 0,
+  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
+
+" ========== fzf end ==========
