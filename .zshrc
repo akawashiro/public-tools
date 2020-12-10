@@ -160,7 +160,7 @@ alias mv='mv -i'
 
 alias mkdir='mkdir -p'
 
-alias ta='tmux a -t'
+alias ta='tmux a -d -t'
 alias tls='tmux ls'
 alias tkill='tmux kill-session -t'
 alias find-grep='find . -name "*" -type f | xargs grep'
