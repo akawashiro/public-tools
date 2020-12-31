@@ -246,6 +246,4 @@ if [ -S "$SSH_AUTH_SOCK" ]; then
   fi
 fi
 
-eval $(ssh-agent)
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
