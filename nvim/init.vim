@@ -45,6 +45,7 @@ set shiftwidth=4
 set tabstop=4
 set expandtab
 set cindent
+set spell
 syntax on
 
 set nocompatible
