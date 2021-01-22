@@ -151,6 +151,7 @@ bindkey '^R' history-incremental-pattern-search-backward
 # エイリアス
 
 alias nv='nvim'
+alias vimdiff='nvim -d'
 
 alias la='ls -al'
 alias ll='ls -l'
