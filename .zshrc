@@ -246,4 +246,18 @@ if [ -S "$SSH_AUTH_SOCK" ]; then
   fi
 fi
 
+########### fzf settings ##########
+# C-b checkout branch
+# C-r Search history
+# C-t Search files under the current directory
+
+function fzf-checkout-branch() {
+  local branches branch
+  branches=$(git branch | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
+  branch=$(echo "$branches" | fzf --preview "git show --color=always {}") &&
+  git checkout $(echo "$branch")
+}
+zle     -N   fzf-checkout-branch
+bindkey "^b" fzf-checkout-branch
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
