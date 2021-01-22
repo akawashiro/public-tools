@@ -246,7 +246,7 @@ fi
 
 function fzf-checkout-branch() {
   local branches branch
-  branches=$(git branch | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
+  branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
   branch=$(echo "$branches" | fzf --preview "git show --color=always {}") &&
   git checkout $(echo "$branch")
 }
