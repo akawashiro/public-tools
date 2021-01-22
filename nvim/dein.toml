@@ -179,3 +179,9 @@ hook_add = '''
     let g:airline_symbols.linenr = '☰'
     let g:airline_symbols.maxlinenr = ''
 '''
+
+[[plugins]]
+repo = 'davidhalter/jedi-vim'
+
+[[plugins]]
+repo = 'tell-k/vim-autopep8'
