@@ -219,13 +219,6 @@ alias ocaml='ledit ocaml'
 
 alias tl='tw -tl'
 
-function ggl() {
-  command w3m "www.google.co.jp/search?q=${1}"
-}
-
-# alias for pip10. this line will be removed after upgrade of ubuntu.
-# alias pip='python -m pip'
-
 function haskell-purify-force(){
     if [ $# -ne 1 ]; then
         echo "You need to give a haskell source code."
@@ -247,5 +240,19 @@ if [ -S "$SSH_AUTH_SOCK" ]; then
     ssh-add "$HOME/.ssh/id_rsa"
   fi
 fi
+
+########### fzf settings ##########
+# C-b checkout branch
+# C-r Search history
+# C-t Search files under the current directory
+
+function fzf-checkout-branch() {
+  local branches branch
+  branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
+  branch=$(echo "$branches" | fzf --preview "git show --color=always {}") &&
+  git checkout $(echo "$branch")
+}
+zle     -N   fzf-checkout-branch
+bindkey "^b" fzf-checkout-branch
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

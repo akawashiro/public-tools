@@ -47,6 +47,12 @@ set expandtab
 set cindent
 syntax on
 
+set spell
+highlight clear SpellBad
+highlight SpellBad cterm=underline
+" Set style for gVim
+highlight SpellBad gui=undercurl
+
 set nocompatible
 set whichwrap=b,s,h,l,<,>,[,],~
 set backspace=indent,eol,start
@@ -59,7 +65,6 @@ inoremap jj <Esc>
 set guifont =DejaVu\ Sans\ Mono\ 10 
 set nofoldenable    " disable folding
 
-set cursorline
 set cursorcolumn
 
 " buffer
