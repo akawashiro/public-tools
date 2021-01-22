@@ -217,13 +217,6 @@ alias ocaml='ledit ocaml'
 
 alias tl='tw -tl'
 
-function ggl() {
-  command w3m "www.google.co.jp/search?q=${1}"
-}
-
-# alias for pip10. this line will be removed after upgrade of ubuntu.
-# alias pip='python -m pip'
-
 function haskell-purify-force(){
     if [ $# -ne 1 ]; then
         echo "You need to give a haskell source code."
