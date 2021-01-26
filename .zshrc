@@ -250,5 +250,4 @@ zle     -N   fzf-checkout-branch
 bindkey "^b" fzf-checkout-branch
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-[ -f ~/.machine_specific.zsh ] && source .machine_specific.zsh
+[ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
