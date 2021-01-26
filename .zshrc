@@ -170,6 +170,7 @@ alias find-grep='find . -name "*" -type f | xargs grep'
 alias gl="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%ad %C(green)%an%Creset%x09%s %C(red)%d%Creset\""
 alias gs="git status"
 alias gg="git log --graph --all --decorate=full"
+alias gc="git checkout -b"
 
 # Enable alias after sudo
 alias sudo='sudo '
