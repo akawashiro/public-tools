@@ -34,9 +34,9 @@ function tnew(){
     tmux new -s ${d}
 }
 
-function ghist(){
-    git diff HEAD~$1
-}
+# function ghist(){
+#     git diff HEAD~$1
+# }
 
 # 色を使用出来るようにする
 autoload -Uz colors
@@ -148,10 +148,9 @@ setopt extended_glob
 bindkey '^R' history-incremental-pattern-search-backward
 
 ########################################
-# エイリアス
+# alias
 
-alias nv='nvim'
-alias vimdiff='nvim -d'
+alias v='nvim'
 
 alias la='ls -al'
 alias ll='ls -l'
@@ -167,17 +166,16 @@ alias tls='tmux ls'
 alias tkill='tmux kill-session -t'
 alias find-grep='find . -name "*" -type f | xargs grep'
 
-alias glog="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%ad %C(green)%an%Creset%x09%s %C(red)%d%Creset\""
-alias gsta="git status"
-alias ggraph="git log --graph --all --decorate=full"
-alias gdiff="ydiff -s -w0"
+alias gl="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%ad %C(green)%an%Creset%x09%s %C(red)%d%Creset\""
+alias gs="git status"
+alias gg="git log --graph --all --decorate=full"
 
-# sudo の後のコマンドでエイリアスを有効にする
+# Enable alias after sudo
 alias sudo='sudo '
 
-# グローバルエイリアス
-alias -g L='| less'
-alias -g G='| grep'
+# Global alias
+# alias -g L='| less'
+# alias -g G='| grep'
 alias -g ...='../..'
 alias -g ....='../../..'
 
@@ -199,15 +197,13 @@ elif which putclip >/dev/null 2>&1 ; then
 fi
 
 ########################################
-# OS 別の設定
+# OS specific settings
 case ${OSTYPE} in
     darwin*)
-        #Mac用の設定
         export CLICOLOR=1
         alias ls='ls -G -F'
         ;;
     linux*)
-        #Linux用の設定
         alias ls='ls -F --color=auto'
         ;;
 esac
@@ -215,9 +211,6 @@ esac
 # vim:set ft=zsh:
 
 alias ocaml='ledit ocaml'
-
-
-alias tl='tw -tl'
 
 function haskell-purify-force(){
     if [ $# -ne 1 ]; then
