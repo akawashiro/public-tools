@@ -2,6 +2,7 @@
 # Environment variables
 export LANG=en_US.UTF-8
 
+export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
