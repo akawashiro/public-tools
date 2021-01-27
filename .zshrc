@@ -5,6 +5,8 @@ export LANG=en_US.UTF-8
 export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
+export PATH=$HOME/pfn-tools:$PATH
+export PATH=$HOME/public-tools:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.go/bin:$PATH
 export PATH="$GOPATH/.bin:$PATH"
@@ -34,9 +36,9 @@ function tnew(){
     tmux new -s ${d}
 }
 
-function ghist(){
-    git diff HEAD~$1
-}
+# function ghist(){
+#     git diff HEAD~$1
+# }
 
 # 色を使用出来るようにする
 autoload -Uz colors
@@ -50,12 +52,24 @@ HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
 
-# プロンプト
-# 1行表示
-# PROMPT="%~ %# "
-# 2行表示
-PROMPT="%{${fg[green]}%}[%n@%m]%{${reset_color}%} %* %~
-%# "
+
+########################################
+# vcs_info
+autoload -Uz vcs_info
+autoload -Uz add-zsh-hook
+
+zstyle ':vcs_info:*' formats '%F{red}(%b)%f'
+zstyle ':vcs_info:*' actionformats '%F{red}(%b|%a)%f'
+
+function _update_vcs_info_msg() {
+    LANG=en_US.UTF-8 vcs_info
+}
+add-zsh-hook precmd _update_vcs_info_msg
+
+# Prompt
+setopt PROMPT_SUBST
+PROMPT='%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
+> '
 
 
 # 単語の区切り文字を指定する
@@ -84,21 +98,6 @@ zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
 
 # ps コマンドのプロセス名補完
 zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
-
-
-########################################
-# vcs_info
-autoload -Uz vcs_info
-autoload -Uz add-zsh-hook
-
-zstyle ':vcs_info:*' formats '%F{green}(%s)-[%b]%f'
-zstyle ':vcs_info:*' actionformats '%F{red}(%s)-[%b|%a]%f'
-
-function _update_vcs_info_msg() {
-    LANG=en_US.UTF-8 vcs_info
-    RPROMPT="${vcs_info_msg_0_}"
-}
-add-zsh-hook precmd _update_vcs_info_msg
 
 
 ########################################
@@ -148,9 +147,9 @@ setopt extended_glob
 bindkey '^R' history-incremental-pattern-search-backward
 
 ########################################
-# エイリアス
+# alias
 
-alias nv='nvim'
+alias v='nvim'
 
 alias la='ls -al'
 alias ll='ls -l'
@@ -166,17 +165,17 @@ alias tls='tmux ls'
 alias tkill='tmux kill-session -t'
 alias find-grep='find . -name "*" -type f | xargs grep'
 
-alias glog="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%ad %C(green)%an%Creset%x09%s %C(red)%d%Creset\""
-alias gsta="git status"
-alias ggraph="git log --graph --all --decorate=full"
-alias gdiff="ydiff -s -w0"
+alias gl="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%ad %C(green)%an%Creset%x09%s %C(red)%d%Creset\""
+alias gs="git status"
+alias gg="git log --graph --all --decorate=full"
+alias gc="git checkout -b"
 
-# sudo の後のコマンドでエイリアスを有効にする
+# Enable alias after sudo
 alias sudo='sudo '
 
-# グローバルエイリアス
-alias -g L='| less'
-alias -g G='| grep'
+# Global alias
+# alias -g L='| less'
+# alias -g G='| grep'
 alias -g ...='../..'
 alias -g ....='../../..'
 
@@ -198,15 +197,13 @@ elif which putclip >/dev/null 2>&1 ; then
 fi
 
 ########################################
-# OS 別の設定
+# OS specific settings
 case ${OSTYPE} in
     darwin*)
-        #Mac用の設定
         export CLICOLOR=1
         alias ls='ls -G -F'
         ;;
     linux*)
-        #Linux用の設定
         alias ls='ls -F --color=auto'
         ;;
 esac
@@ -214,16 +211,6 @@ esac
 # vim:set ft=zsh:
 
 alias ocaml='ledit ocaml'
-
-
-alias tl='tw -tl'
-
-function ggl() {
-  command w3m "www.google.co.jp/search?q=${1}"
-}
-
-# alias for pip10. this line will be removed after upgrade of ubuntu.
-# alias pip='python -m pip'
 
 function haskell-purify-force(){
     if [ $# -ne 1 ]; then
@@ -247,4 +234,19 @@ if [ -S "$SSH_AUTH_SOCK" ]; then
   fi
 fi
 
+########### fzf settings ##########
+# C-b checkout branch
+# C-r Search history
+# C-t Search files under the current directory
+
+function fzf-checkout-branch() {
+  local branches branch
+  branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
+  branch=$(echo "$branches" | fzf --preview "git show --color=always {}") &&
+  git checkout $(echo "$branch")
+}
+zle     -N   fzf-checkout-branch
+bindkey "^b" fzf-checkout-branch
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh

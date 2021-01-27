@@ -1,4 +1,16 @@
 [[plugins]]
+repo = 'mechatroner/rainbow_csv'
+
+[[plugins]]
+repo = 'chrisbra/Colorizer'
+
+[[plugins]]
+repo = 'davidhalter/jedi-vim'
+
+[[plugins]]
+repo = 'tell-k/vim-autopep8'
+
+[[plugins]]
 repo = 'vim-scripts/a.vim'
 on_ft = ['c', 'cpp']
 hook_source = '''
@@ -179,3 +191,9 @@ hook_add = '''
     let g:airline_symbols.linenr = '☰'
     let g:airline_symbols.maxlinenr = ''
 '''
+
+[[plugins]]
+repo = 'davidhalter/jedi-vim'
+
+[[plugins]]
+repo = 'tell-k/vim-autopep8'
