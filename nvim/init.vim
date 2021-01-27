@@ -47,6 +47,8 @@ set expandtab
 set cindent
 syntax on
 
+colorscheme darkblue
+
 set spell
 highlight clear SpellBad
 highlight SpellBad cterm=underline
