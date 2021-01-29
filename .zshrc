@@ -169,6 +169,11 @@ alias gl="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%a
 alias gs="git status"
 alias gg="git log --graph --all --decorate=full"
 alias gc="git checkout -b"
+alias gf="git fetch --all"
+
+function gp(){
+    git push origin `git rev-parse --abbrev-ref HEAD`
+}
 
 # Enable alias after sudo
 alias sudo='sudo '
