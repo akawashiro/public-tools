@@ -1,6 +1,7 @@
 ########## Environment variables start ##########
 
 export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 
 export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
