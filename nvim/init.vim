@@ -74,6 +74,9 @@ map <silent> tn :bnext<CR>
 map <silent> tp :bprevious<CR>
 map <silent> td :bdelete<CR>
 
+" Without this option, you cannot switch between tabs before saving.
+set hidden
+
 set completeopt=menuone
 
 " ========== nvim end ==========
