@@ -1,5 +1,5 @@
-########################################
-# Environment variables
+########## Environment variables start ##########
+
 export LANG=en_US.UTF-8
 
 export PATH=/var/lib/snapd/snap/bin:$PATH
@@ -11,9 +11,9 @@ export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.go/bin:$PATH
 export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
+export PATH="$PYENV_ROOT/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
@@ -28,7 +28,9 @@ export CCACHE_TEMPDIR=$HOME/.ccache
 export OCAMLPARAM="_,bin-annot=1"
 export OPAMKEEPBUILDDIR=1
 
-# tmux auto rename
+########## Environment variables end ##########
+
+########## tmux start ##########
 
 function tnew(){
     local c=`pwd`
@@ -36,24 +38,27 @@ function tnew(){
     tmux new -s ${d}
 }
 
-# function ghist(){
-#     git diff HEAD~$1
-# }
+alias ta='tmux a -d -t'
+alias tls='tmux ls'
+alias tkill='tmux kill-session -t'
 
-# 色を使用出来るようにする
-autoload -Uz colors
-colors
+########## tmux end ##########
 
-# vim 風キーバインドにする
-bindkey -v
+########## git start ##########
 
-# ヒストリの設定
-HISTFILE=~/.zsh_history
-HISTSIZE=1000000
-SAVEHIST=1000000
+alias gl="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%ad %C(green)%an%Creset%x09%s %C(red)%d%Creset\""
+alias gs="git status"
+alias gg="git log --graph --all --decorate=full"
+alias gc="git checkout -b"
+alias gf="git fetch --all"
 
+function gp(){
+    git push origin `git rev-parse --abbrev-ref HEAD`
+}
 
-########################################
+########## git end ##########
+
+########## PROMPT start ##########
 # vcs_info
 autoload -Uz vcs_info
 autoload -Uz add-zsh-hook
@@ -71,6 +76,21 @@ setopt PROMPT_SUBST
 PROMPT='%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
 > '
 
+########## PROMPT end ##########
+
+########## zsh miscellaneous start ###########
+
+# Enable color
+autoload -Uz colors
+colors
+
+# Vim-style key-binding
+bindkey -v
+
+# History setting
+HISTFILE=~/.zsh_history
+HISTSIZE=1000000
+SAVEHIST=1000000
 
 # 単語の区切り文字を指定する
 autoload -Uz select-word-style
@@ -146,8 +166,11 @@ setopt extended_glob
 # ^R で履歴検索をするときに * でワイルドカードを使用出来るようにする
 bindkey '^R' history-incremental-pattern-search-backward
 
-########################################
-# alias
+# vim:set ft=zsh:
+
+########## zsh miscellaneous end ###########
+
+########## alias start ##########
 
 alias v='nvim'
 
@@ -160,20 +183,8 @@ alias mv='mv -i'
 
 alias mkdir='mkdir -p'
 
-alias ta='tmux a -d -t'
-alias tls='tmux ls'
-alias tkill='tmux kill-session -t'
 alias find-grep='find . -name "*" -type f | xargs grep'
 
-alias gl="git log --graph --date=short --pretty=\"format:%C(yellow)%h %C(cyan)%ad %C(green)%an%Creset%x09%s %C(red)%d%Creset\""
-alias gs="git status"
-alias gg="git log --graph --all --decorate=full"
-alias gc="git checkout -b"
-alias gf="git fetch --all"
-
-function gp(){
-    git push origin `git rev-parse --abbrev-ref HEAD`
-}
 
 # Enable alias after sudo
 alias sudo='sudo '
@@ -184,12 +195,15 @@ alias sudo='sudo '
 alias -g ...='../..'
 alias -g ....='../../..'
 
+########## alias end ##########
+
 # kubernetes
 # [ -f $HOME/tools/.kubectl_aliases ] && source $HOME/tools/.kubectl_aliases
 # source <(kubectl completion zsh)
 
-# C で標準出力をクリップボードにコピーする
+############ Copy to stdout to clipboard start ############
 # mollifier delta blog : http://mollifier.hatenablog.com/entry/20100317/p1
+
 if which pbcopy >/dev/null 2>&1 ; then
     # Mac
     alias -g C='| pbcopy'
@@ -200,6 +214,8 @@ elif which putclip >/dev/null 2>&1 ; then
     # Cygwin
     alias -g C='| putclip'
 fi
+
+############ Copy to stdout to clipboard end ############
 
 ########################################
 # OS specific settings
@@ -213,9 +229,7 @@ case ${OSTYPE} in
         ;;
 esac
 
-# vim:set ft=zsh:
-
-alias ocaml='ledit ocaml'
+########### Haskell start ##########
 
 function haskell-purify-force(){
     if [ $# -ne 1 ]; then
@@ -228,7 +242,11 @@ function haskell-purify-force(){
     fi
 }
 
-# OPAM configuration
+########### Haskell end ##########
+
+########### OCaml start ##########
+
+alias ocaml='ledit ocaml'
 . $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 fpath=(~/.zsh/completion $fpath)
@@ -239,7 +257,9 @@ if [ -S "$SSH_AUTH_SOCK" ]; then
   fi
 fi
 
-########### fzf settings ##########
+########### OCaml end ##########
+
+########## fzf start ########## 
 # C-b checkout branch
 # C-r Search history
 # C-t Search files under the current directory
@@ -254,4 +274,11 @@ zle     -N   fzf-checkout-branch
 bindkey "^b" fzf-checkout-branch
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+########## fzf start ########## 
+
+########## Load machine specific settings start ##########
+
 [ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
+
+########## Load machine specific settings end ##########
