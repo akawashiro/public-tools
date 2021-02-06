@@ -52,6 +52,7 @@ alias gs="git status"
 alias gg="git log --graph --all --decorate=full"
 alias gc="git checkout -b"
 alias gf="git fetch --all"
+alias gd="git diff"
 
 function gp(){
     git push origin `git rev-parse --abbrev-ref HEAD`
