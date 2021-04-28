@@ -2,6 +2,14 @@
 repo = 'JuliaEditorSupport/julia-vim'
 
 [[plugins]]
+repo = 'neovim/nvim-lspconfig'
+hook_add = '''
+lua << EOF
+    require'lspconfig'.julials.setup{}
+EOF
+'''
+
+[[plugins]]
 repo = 'mechatroner/rainbow_csv'
 
 [[plugins]]
