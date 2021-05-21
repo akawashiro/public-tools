@@ -74,9 +74,33 @@ function _update_vcs_info_msg() {
 add-zsh-hook precmd _update_vcs_info_msg
 
 # Prompt
+
+function preexec() {
+  timer=$(($(date +%s%0N)/1000000))
+}
+
 setopt PROMPT_SUBST
 PROMPT='%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
 > '
+
+function precmd() {
+  if [ $timer ]; then
+    now=$(($(date +%s%0N)/1000000))
+    elapsed=$(($now-$timer))
+
+    if [ $elapsed -ge 10000 ]
+    then
+        PROMPT='%F{cyan}${elapsed}ms %{$reset_color%}
+%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
+> '
+    else
+        PROMPT='%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
+> '
+    fi
+    unset timer
+  fi
+}
+
 
 ########## PROMPT end ##########
 
