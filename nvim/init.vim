@@ -101,17 +101,17 @@ command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : 
 
 " ========== julia start ==========
 
-lua << EOF
-    require'lspconfig'.julials.setup{}
-EOF
-
-autocmd Filetype julia setlocal omnifunc=v:lua.vim.lsp.omnifunc
-
-nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> gD    <cmd>lua vim.lsp.buf.declaration()()<CR>
-nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
-nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> gi    <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+" lua << EOF
+"     require'lspconfig'.julials.setup{}
+" EOF
+" 
+" autocmd Filetype julia setlocal omnifunc=v:lua.vim.lsp.omnifunc
+" 
+" nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
+" nnoremap <silent> gD    <cmd>lua vim.lsp.buf.declaration()()<CR>
+" nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+" nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+" nnoremap <silent> gi    <cmd>lua vim.lsp.buf.implementation()<CR>
+" nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
 
 " ========== julia end ==========
