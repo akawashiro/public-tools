@@ -211,6 +211,7 @@ alias mkdir='mkdir -p'
 
 alias find-grep='find . -name "*" -type f | xargs grep'
 
+alias remove-color="sed 's/\x1b\[[0-9;]*m//g'"
 
 # Enable alias after sudo
 alias sudo='sudo '
