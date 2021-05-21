@@ -90,12 +90,7 @@ function precmd() {
 
     if [ $elapsed -ge 10000 ]
     then
-        PROMPT='%F{cyan}${elapsed}ms %{$reset_color%}
-%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
-> '
-    else
-        PROMPT='%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
-> '
+        echo "${elapsed}ms"
     fi
     unset timer
   fi
