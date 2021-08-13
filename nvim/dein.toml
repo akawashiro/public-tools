@@ -10,6 +10,9 @@
 # '''
 
 [[plugins]]
+repo = 'tpope/vim-rhubarb'
+
+[[plugins]]
 repo = 'mechatroner/rainbow_csv'
 
 [[plugins]]
