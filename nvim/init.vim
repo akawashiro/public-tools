@@ -101,6 +101,12 @@ command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : 
 
 " ========== julia start ==========
 
+" ========== rhubarb.vim start ===========
+
+let g:github_enterprise_urls = ['https://github.pfidev.jp']
+
+" ========== rhubarb.vim end ===========
+
 " lua << EOF
 "     require'lspconfig'.julials.setup{}
 " EOF
