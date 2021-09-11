@@ -39,9 +39,12 @@ build = './install --all'
 repo = 'junegunn/fzf.vim'
 depends = [ 'junegunn/fzf' ]
 hook_add = '''
+    command! -bang -nargs=* GCGrep call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 0, fzf#vim#with_preview({'options': ['--query', expand('<cword>')], 'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
+
     noremap <Leader>ff :Files<CR>
     noremap <Leader>fgf :GFiles<CR>
     noremap <Leader>fgg :GGrep<CR>
+    noremap <Leader>fgc :GCGrep<CR>
     noremap <Leader>fa :Ag<CR>
     noremap <Leader>fb :Buffers<CR>
 '''
