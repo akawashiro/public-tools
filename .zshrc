@@ -53,6 +53,7 @@ alias gg="git log --graph --all --decorate=full"
 alias gc="git checkout -b"
 alias gf="git fetch --all"
 alias gd="git diff"
+alias gr="git remote -v"
 
 function gp(){
     git push origin `git rev-parse --abbrev-ref HEAD`
@@ -302,5 +303,6 @@ bindkey "^b" fzf-checkout-branch
 ########## Load machine specific settings start ##########
 
 [ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
+source <(pf kubectl completion zsh)
 
 ########## Load machine specific settings end ##########
