@@ -34,8 +34,8 @@ export OPAMKEEPBUILDDIR=1
 ########## tmux start ##########
 
 function tnew(){
-    local c=`pwd`
-    local d=`basename $c`
+    local c=$(pwd)
+    local d=$(basename "${c}" | tr . _)
     tmux new -s ${d}
 }
 

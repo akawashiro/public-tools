@@ -101,6 +101,8 @@ command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : 
 
 " ========== julia start ==========
 
+autocmd BufNewFile,BufRead *.jl setfiletype julia
+
 " ========== rhubarb.vim start ===========
 
 let g:github_enterprise_urls = ['https://github.pfidev.jp']
