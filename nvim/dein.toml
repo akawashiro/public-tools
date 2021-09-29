@@ -1,13 +1,5 @@
-# [[plugins]]
-# repo = 'JuliaEditorSupport/julia-vim'
-# 
-# [[plugins]]
-# repo = 'neovim/nvim-lspconfig'
-# hook_add = '''
-# lua << EOF
-#     require'lspconfig'.julials.setup{}
-# EOF
-# '''
+[[plugins]]
+repo = 'JuliaEditorSupport/julia-vim'
 
 [[plugins]]
 repo = 'tpope/vim-rhubarb'
@@ -24,6 +16,7 @@ repo = 'davidhalter/jedi-vim'
 [[plugins]]
 repo = 'tell-k/vim-autopep8'
 
+# Jump to the corresponding header or source file
 [[plugins]]
 repo = 'vim-scripts/a.vim'
 on_ft = ['c', 'cpp']
