@@ -1,4 +1,13 @@
 [[plugins]]
+repo = 'skywind3000/asyncrun.vim'
+hook_add = '''
+    noremap <Leader>at :AsyncRun! ./test.sh<CR>
+'''
+
+[[plugins]]
+repo = 'neovim/nvim-lspconfig'
+
+[[plugins]]
 repo = 'JuliaEditorSupport/julia-vim'
 
 [[plugins]]
