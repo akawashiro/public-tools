@@ -61,6 +61,14 @@ function gp(){
 
 ########## git end ##########
 
+########## kubectl start ##########
+
+alias kgp="pf kubectl get pod"
+alias kgj="pf kubectl get job"
+alias kd="pf kubectl describe"
+
+########## kubectl end ##########
+
 ########## PROMPT start ##########
 # vcs_info
 autoload -Uz vcs_info
