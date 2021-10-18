@@ -67,6 +67,9 @@ function gp(){
 alias kgp="pf kubectl get pod"
 alias kgj="pf kubectl get job"
 alias kd="pf kubectl describe"
+alias kdp="pf kubectl describe pod"
+alias kdj="pf kubectl describe job"
+alias klf="pf kubectl logs -f"
 
 ########## kubectl end ##########
 

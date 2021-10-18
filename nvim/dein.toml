@@ -1,7 +1,7 @@
 [[plugins]]
 repo = 'skywind3000/asyncrun.vim'
 hook_add = '''
-    noremap <Leader>at :AsyncRun! ./test.sh<CR>
+    noremap <Leader>at :AsyncRun ./test.sh<CR>
 '''
 
 [[plugins]]
