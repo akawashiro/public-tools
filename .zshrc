@@ -55,6 +55,7 @@ alias gf="git fetch --all"
 alias gd="git diff"
 alias gr="git remote -v"
 alias gwip="git add -u && git commit -m \"WIP\" && git push origin `git rev-parse --abbrev-ref HEAD`"
+alias glm="git fetch --all && git checkout master && git merge upstream/master"
 
 function gp(){
     git push origin `git rev-parse --abbrev-ref HEAD`
