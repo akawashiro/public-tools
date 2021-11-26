@@ -1,0 +1,13 @@
+#!/bin/bash -eux
+
+if [ $# -ne 1 ]; then
+    echo "You must specify the target directory."
+    exit 1
+fi
+
+git clone git@github.com:akawashiro/linux.git $1
+cd $1
+git remote add torvalds git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+git remote add focal git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/focal
+git remote set-url torvalds --push no-push
+git remote set-url focal --push no-push
