@@ -1,5 +1,7 @@
 #! /bin/bash -eux
 
+sudo apt install clang-11
+
 LINUX_DIR=${HOME}/linux-build-test
 BRANCH_NAME=fix-load_addr-v3-patch
 USE_CPUS=$(nproc --all)
@@ -10,7 +12,7 @@ git clone --depth=1 --branch ${BRANCH_NAME} --single-branch https://github.com/a
 
 cd ${LINUX_DIR}
 
-for c_compiler in gcc clang
+for c_compiler in gcc clang-11
 do
     make clean
     ccache -C
