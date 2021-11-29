@@ -1,7 +1,7 @@
 #! /bin/bash -eux
 
 LINUX_DIR=${HOME}/linux-build-test
-BRANCH_NAME=fix-load_addr-v2-patch
+BRANCH_NAME=fix-load_addr-v3-patch
 
 rm -rf ${LINUX_DIR}
 git clone --depth=1 --branch ${BRANCH_NAME} --single-branch git@github.com:akawashiro/linux.git
