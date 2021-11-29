@@ -3,14 +3,10 @@
 LINUX_DIR=${HOME}/linux-build-test
 BRANCH_NAME=fix-load_addr-v2-patch
 
-if [[ ! -d "${LINUX_DIR}" ]]
-then
-    git clone git@github.com:akawashiro/linux.git "${LINUX_DIR}"
-fi
+rm -rf ${LINUX_DIR}
+git clone --depth=1 --branch ${BRANCH_NAME} --single-branch git@github.com:akawashiro/linux.git
 
 cd ${LINUX_DIR}
-git fetch --all
-git checkout origin/${BRANCH_NAME}
 
 for c_compiler in gcc clang
 do
