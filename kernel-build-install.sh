@@ -1,6 +1,6 @@
 #! /bin/bash -eux
 
-sudo apt-get -y build-dep linux linux-image-$(uname -r)
+# sudo apt-get -y build-dep linux linux-image-$(uname -r)
 sudo apt-get -y install libncurses-dev gawk flex bison openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev libiberty-dev autoconf git ccache dwarves
 
 LINUX_DIR=${HOME}/linux
