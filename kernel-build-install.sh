@@ -5,6 +5,8 @@ sudo apt-get -y install libncurses-dev gawk flex bison openssl libssl-dev dkms l
 
 LINUX_DIR=${HOME}/linux
 BRANCH_NAME=fix-load_addr-v4
+USE_CPUS=$(nproc --all)
+USE_CPUS=$((USE_CPUS-2))
 
 if [[ ! -d "${LINUX_DIR}" ]]
 then
@@ -18,7 +20,7 @@ cp /boot/config-$(uname -r) ${LINUX_DIR}/.config
 cat ${LINUX_DIR}/.config | sed -e "s/CONFIG_SYSTEM_TRUSTED_KEYS=".*"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/g" | sed -e "s/CONFIG_SYSTEM_REVOCATION_KEYS=".*"/CONFIG_SYSTEM_REVOCATION_KEYS=\"\"/g" > ${LINUX_DIR}/.config.bak
 cp ${LINUX_DIR}/.config.bak ${LINUX_DIR}/.config
 make localmodconfig
-LOCALVERSION=-dev-${BRANCH_NAME} make CC="ccache gcc" -j 3
+LOCALVERSION=-dev-${BRANCH_NAME} make CC="ccache gcc" -j ${USE_CPUS}
 sudo make modules_install
 sudo make install
 
