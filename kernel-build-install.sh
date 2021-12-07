@@ -4,7 +4,7 @@
 sudo apt-get -y install libncurses-dev gawk flex bison openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev libiberty-dev autoconf git ccache dwarves
 
 LINUX_DIR=${HOME}/linux
-BRANCH_NAME=fix-load_addr-v4
+BRANCH_NAME=fix-load_addr-patch-v4
 USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
 
