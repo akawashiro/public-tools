@@ -17,7 +17,10 @@ do
     make clean
     ccache -C
     make KCFLAGS="-W" CC="ccache ${c_compiler}" -k olddefconfig
-    cat ${LINUX_DIR}/.config | sed -e "s/CONFIG_SYSTEM_TRUSTED_KEYS=".*"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/g" | sed -e "s/CONFIG_SYSTEM_REVOCATION_KEYS=".*"/CONFIG_SYSTEM_REVOCATION_KEYS=\"\"/g" > ${LINUX_DIR}/.config.bak
+    cat ${LINUX_DIR}/.config | \
+        sed -e "s/CONFIG_SYSTEM_TRUSTED_KEYS=".*"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/g" | \
+        sed -e "s/CONFIG_SYSTEM_REVOCATION_KEYS=".*"/CONFIG_SYSTEM_REVOCATION_KEYS=\"\"/g" \
+        > ${LINUX_DIR}/.config.bak
     cp ${LINUX_DIR}/.config.bak ${LINUX_DIR}/.config
     log=$(echo "${LINUX_DIR}/build.${c_compiler}.log" | tr " " "_")
     LOCALVERSION=-dev-${BRANCH_NAME} make KCFLAGS="-W" CC="ccache ${c_compiler}" -k -j ${USE_CPUS} 2>&1 | tee ${log}
