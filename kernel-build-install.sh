@@ -20,7 +20,7 @@ cp /boot/config-$(uname -r) ${LINUX_DIR}/.config
 cat ${LINUX_DIR}/.config | sed -e "s/CONFIG_SYSTEM_TRUSTED_KEYS=".*"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/g" | sed -e "s/CONFIG_SYSTEM_REVOCATION_KEYS=".*"/CONFIG_SYSTEM_REVOCATION_KEYS=\"\"/g" > ${LINUX_DIR}/.config.bak
 cp ${LINUX_DIR}/.config.bak ${LINUX_DIR}/.config
 make localmodconfig
-LOCALVERSION=-dev-${BRANCH_NAME} make CC="ccache gcc" -j ${USE_CPUS}
+LOCALVERSION=-dev-${BRANCH_NAME} make CC="ccache clang-11 --analyze" -j ${USE_CPUS} 2>&1 | tee ${LINUX_DIR}/build.log
 sudo make modules_install
 sudo make install
 
