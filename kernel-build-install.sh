@@ -10,7 +10,7 @@ USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
 
 pushd /boot
-ls -1 | grep ${BRANCH_NAME} | xargs -I sudo rm {}
+ls -1 | grep ${BRANCH_NAME} | xargs sudo rm
 popd
 sudo update-grub
 exit 0
