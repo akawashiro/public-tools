@@ -11,11 +11,16 @@ USE_CPUS=$((USE_CPUS-2))
 
 # We should not install kernels with the same name
 pushd /boot
-if [ $(ls -1 /boot | grep linux | wc -l) -ne 0 ]; then
+if [ $(ls -1 | grep linux | wc -l) -ne 0 ]; then
     ls -1 | grep ${BRANCH_NAME} | xargs sudo rm
-    sudo update-grub
 fi
 popd
+pushd/lib/modules
+if [ $(ls -1 | grep linux | wc -l) -ne 0 ]; then
+    ls -1 | grep ${BRANCH_NAME} | xargs sudo rm -r
+fi
+popd
+sudo update-grub
 
 if [[ ! -d "${LINUX_DIR}" ]]
 then
