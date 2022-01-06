@@ -15,7 +15,7 @@ if [ $(ls -1 | grep linux | wc -l) -ne 0 ]; then
     ls -1 | grep ${BRANCH_NAME} | xargs sudo rm
 fi
 popd
-pushd/lib/modules
+pushd /lib/modules
 if [ $(ls -1 | grep linux | wc -l) -ne 0 ]; then
     ls -1 | grep ${BRANCH_NAME} | xargs sudo rm -r
 fi
