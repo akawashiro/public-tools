@@ -1,7 +1,13 @@
 #! /bin/bash
 
+apt update
+apt install build-essential
+
 cd /root/
-git clone https://github.com/bminor/glibc.git
+if [ -d "/root/glibc" ]; then
+    git clone https://github.com/bminor/glibc.git glibc
+fi
+
 mkdir -p /root/glibc-build
 cd /root/glibc-build
 ../glibc/configure --prefix=/root/glibc-install
