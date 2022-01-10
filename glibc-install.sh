@@ -1,7 +1,7 @@
 #! /bin/bash
 
 apt update
-apt install build-essential
+apt install -y build-essential python3 gawk bison
 
 cd /root/
 if [ -d "/root/glibc" ]; then
