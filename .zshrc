@@ -58,10 +58,25 @@ alias gf="git fetch --all"
 alias gd="git diff"
 alias gr="git remote -v"
 alias gwip="git add -u && git commit -m \"WIP\" && git push origin `git rev-parse --abbrev-ref HEAD`"
-alias glm="git fetch --all && git checkout master && git merge upstream/master"
+
+function glm(){
+    git fetch --all
+    local is_master=$(git branch | grep master)
+    local is_main=$(git branch | grep main)
+    if [ ! -z "${is_master}" ]; then
+        git checkout master
+        git merge upstream/master
+    elif [ ! -z "${is_main}" ]; then 
+        git checkout main
+        git merge upstream/main
+    else
+        echo "Cannot find master or main branch."
+        exit 1
+    fi
+}
 
 function gp(){
-    git push origin `git rev-parse --abbrev-ref HEAD`
+    git push origin $(git rev-parse --abbrev-ref HEAD)
 }
 
 ########## git end ##########
