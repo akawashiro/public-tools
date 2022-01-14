@@ -8,6 +8,7 @@ export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/pfn-tools:$PATH
 export PATH=$HOME/public-tools:$PATH
+export PATH=$HOME/tools:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.go/bin:$PATH
 export PATH="$GOPATH/.bin:$PATH"
@@ -28,6 +29,8 @@ export CCACHE_TEMPDIR=$HOME/.ccache
 
 export OCAMLPARAM="_,bin-annot=1"
 export OPAMKEEPBUILDDIR=1
+
+export MANPAGER='nvim +Man!'
 
 ########## Environment variables end ##########
 
