@@ -5,7 +5,7 @@
 
 LINUX_DIR=${HOME}/linux
 BUILD_DIR=${HOME}/linux-build
-BRANCH_NAME=fix-load_addr-patch-v4
+BRANCH_NAME=fix-load_addr-patch-v5
 USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
 
