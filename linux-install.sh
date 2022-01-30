@@ -5,9 +5,10 @@
 
 LINUX_DIR=${HOME}/linux
 BUILD_DIR=${HOME}/linux-build
-BRANCH_NAME=fix-load_addr-patch-v5
+BRANCH_NAME=malicious_interp
 USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
+CONFIG_PATH=
 
 # We should not install kernels with the same name
 pushd /boot
@@ -36,6 +37,7 @@ make clean
 # TODO: Want to use out-of-tree build
 # make CC="ccache gcc" O=${BUILD_DIR} olddefconfig 
 
+cp ${CONFIG_PATH} .config
 cat .config | \
     sed -e "s/CONFIG_SYSTEM_TRUSTED_KEYS=".*"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/g" | \
     sed -e "s/CONFIG_SYSTEM_REVOCATION_KEYS=".*"/CONFIG_SYSTEM_REVOCATION_KEYS=\"\"/g" \
