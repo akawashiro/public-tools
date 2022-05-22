@@ -364,6 +364,5 @@ bindkey '^z' fzf-z-search
 ########## Load machine specific settings start ##########
 
 [ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
-source <(pf kubectl completion zsh)
 
 ########## Load machine specific settings end ##########
