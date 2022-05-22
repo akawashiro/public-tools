@@ -15,8 +15,8 @@ export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH="$PYENV_ROOT/bin:$PATH"
 
-export PYENV_ROOT="$HOME/.pyenv"
-eval "$(pyenv init -)"
+# export PYENV_ROOT="$HOME/.pyenv"
+# eval "$(pyenv init -)"
 
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
 
