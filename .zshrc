@@ -15,8 +15,8 @@ export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH="$PYENV_ROOT/bin:$PATH"
 
-export PYENV_ROOT="$HOME/.pyenv"
-eval "$(pyenv init -)"
+# export PYENV_ROOT="$HOME/.pyenv"
+# eval "$(pyenv init -)"
 
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
 
@@ -33,6 +33,23 @@ export OPAMKEEPBUILDDIR=1
 export MANPAGER='nvim +Man!'
 
 ########## Environment variables end ##########
+
+########## zplug start ##########
+
+source ~/.zplug/init.zsh
+
+zplug "rupa/z", use:z.sh
+
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+zplug load --verbose
+
+########## zplug end ##########
 
 ########## tmux start ##########
 
@@ -321,11 +338,24 @@ fi
 function fzf-checkout-branch() {
   local branches branch
   branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
-  branch=$(echo "$branches" | fzf --preview "git show --color=always {}") &&
+  branch=$(echo "$branches" | fzf --height 40% --reverse --preview "git show --color=always {}") &&
   git checkout $(echo "$branch")
 }
 zle     -N   fzf-checkout-branch
 bindkey "^b" fzf-checkout-branch
+
+fzf-z-search() {
+    local res=$(z | sort -rn | cut -c 12- | fzf --height 40% --reverse)
+    if [ -n "$res" ]; then
+        BUFFER+="cd $res"
+        zle accept-line
+    else
+        return 1
+    fi
+}
+
+zle -N fzf-z-search
+bindkey '^z' fzf-z-search
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -334,6 +364,5 @@ bindkey "^b" fzf-checkout-branch
 ########## Load machine specific settings start ##########
 
 [ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
-source <(pf kubectl completion zsh)
 
 ########## Load machine specific settings end ##########
