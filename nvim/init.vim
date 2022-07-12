@@ -109,9 +109,9 @@ let g:github_enterprise_urls = ['https://github.pfidev.jp']
 
 " ========== rhubarb.vim end ===========
 
-" ========== clang format start ==========
+" ========== clang_format start ===========
 let g:clang_format#auto_format = 0
-" ========== clang format end ==========
+" ========== clang_format end ===========
 
 " lua << EOF
 "     require'lspconfig'.julials.setup{}
