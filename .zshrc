@@ -339,7 +339,7 @@ function fzf-checkout-branch() {
   local branches branch
   branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
   branch=$(echo "$branches" | fzf --height 40% --reverse --preview "git show --color=always {}") &&
-  git checkout $(echo "$branch")
+  git switch --create $(echo "$branch" | sed -e "s:^remotes/origin/::") $(echo "$branch") 
 }
 zle     -N   fzf-checkout-branch
 bindkey "^b" fzf-checkout-branch
