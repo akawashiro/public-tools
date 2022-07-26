@@ -1,7 +1,6 @@
 ########## Environment variables start ##########
 
 export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
 
 export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
@@ -31,11 +30,14 @@ export OCAMLPARAM="_,bin-annot=1"
 export OPAMKEEPBUILDDIR=1
 
 export MANPAGER='nvim +Man!'
+# I don't use C-w
+stty werase undef
 
 ########## Environment variables end ##########
 
 ########## zplug start ##########
 
+export ZPLUG_CACHE_DIR=/mnt/nvme0n1/scratch/akirakawata/zplugcache
 source ~/.zplug/init.zsh
 
 zplug "rupa/z", use:z.sh
@@ -106,6 +108,7 @@ alias kd="pf kubectl describe"
 alias kdp="pf kubectl describe pod"
 alias kdj="pf kubectl describe job"
 alias klf="pf kubectl logs -f"
+alias delete-succeeded-jobs="kubectl delete jobs --field-selector status.successful=1"
 
 ########## kubectl end ##########
 
@@ -173,8 +176,8 @@ zstyle ':zle:*' word-style unspecified
 ########################################
 # 補完
 # 補完機能を有効にする
-autoload -Uz compinit
-compinit -i
+# autoload -Uz compinit
+# compinit -u
 
 # 補完で小文字でも大文字にマッチさせる
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
@@ -337,9 +340,15 @@ fi
 
 function fzf-checkout-branch() {
   local branches branch
-  branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1) &&
-  branch=$(echo "$branches" | fzf --height 40% --reverse --preview "git show --color=always {}") &&
-  git switch --create $(echo "$branch" | sed -e "s:^remotes/origin/::") $(echo "$branch") 
+  branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1)
+  branch=$(echo "$branches" | fzf --height 40% --reverse --preview "git show --color=always {}")
+  create_branch=$(echo "$branch" | sed -e "s:^remotes/origin/::")
+  if [ "${branch}" = "${create_branch}" ]
+  then
+    git switch ${branch}
+  else
+    git switch --create ${create_branch} ${branch}
+  fi
 }
 zle     -N   fzf-checkout-branch
 bindkey "^b" fzf-checkout-branch
@@ -366,3 +375,9 @@ bindkey '^z' fzf-z-search
 [ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
 
 ########## Load machine specific settings end ##########
+
+# Remove duplicated entry from PATH
+typeset -U PATH
+
+# Remove /bin from PATH
+export PATH=$(echo $PATH | sed -e "s|:/bin:|:|g"):/bin
