@@ -37,7 +37,6 @@ stty werase undef
 
 ########## zplug start ##########
 
-export ZPLUG_CACHE_DIR=/mnt/nvme0n1/scratch/akirakawata/zplugcache
 source ~/.zplug/init.zsh
 
 zplug "rupa/z", use:z.sh
@@ -324,12 +323,6 @@ alias ocaml='ledit ocaml'
 . $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 fpath=(~/.zsh/completion $fpath)
-
-if [ -S "$SSH_AUTH_SOCK" ]; then
-  if ! ssh-add -l > /dev/null; then
-    ssh-add "$HOME/.ssh/id_rsa"
-  fi
-fi
 
 ########### OCaml end ##########
 
