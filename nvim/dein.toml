@@ -25,14 +25,6 @@ repo = 'davidhalter/jedi-vim'
 [[plugins]]
 repo = 'tell-k/vim-autopep8'
 
-# Jump to the corresponding header or source file
-[[plugins]]
-repo = 'vim-scripts/a.vim'
-on_ft = ['c', 'cpp']
-hook_source = '''
-    nmap <silent> <leader>aa :A<CR>
-'''
-
 [[plugins]]
 repo = 'junegunn/fzf'
 build = './install --all'
@@ -78,12 +70,6 @@ hook_add = '''
 repo = 'airblade/vim-gitgutter'
 
 [[plugins]]
-repo = 'rhysd/vim-clang-format'
-hook_add = '''
-    let g:clang_format#detect_style_file = 1
-'''
-
-[[plugins]]
 repo = 'vim-airline/vim-airline-themes'
 
 [[plugins]]
@@ -104,47 +90,6 @@ repo = 'dhruvasagar/vim-table-mode'
 
 [[plugins]]
 repo = 'Shougo/deoplete.nvim'
-
-[[plugins]]
-repo = 'deoplete-plugins/deoplete-clang'
-hook_add = '''
-    let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
-    let g:deoplete#sources#clang#clang_header = '/usr/include/clang'
-'''
-depends = ['deoplete.nvim']
-
-[[plugins]]
-repo = 'Shougo/neoinclude.vim'
-on_ft = ['c', 'cpp']
-depends = ['deoplete.nvim']
-
-[[plugins]]
-repo = 'lyuts/vim-rtags'
-on_ft = ['c', 'cpp']
-hook_add = '''
-    let g:rtagsUseDefaultMappings = 0
-    let g:rtagsAutoLaunchRdm = 1
-'''
-hook_source = '''
-'''
-
-[[plugins]]
-repo = 'w0rp/ale'
-hook_add = '''
-    let g:ale_sign_column_always = 1
-    let g:ale_fix_on_save = 1
-    let g:ale_completion_enabled = 0
-
-    let g:ale_sign_error = '⨉'
-    let g:ale_sign_warning = '⚠'
-
-    let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-    let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
-    let g:ale_linters = {
-        \   'c' : ['clangd'],
-        \   'cpp' : ['clangd']
-    \}
-'''
 
 [[plugins]]
 repo = 'vim-airline/vim-airline'
@@ -191,8 +136,36 @@ hook_add = '''
     let g:airline_symbols.maxlinenr = ''
 '''
 
+# ========== start cpp ==========
+
+# Jump to the corresponding header or source file
 [[plugins]]
-repo = 'davidhalter/jedi-vim'
+repo = 'vim-scripts/a.vim'
+on_ft = ['c', 'cpp']
+hook_source = '''
+    nmap <silent> <leader>aa :A<CR>
+'''
 
 [[plugins]]
-repo = 'tell-k/vim-autopep8'
+repo = 'neoclide/coc.nvim'
+merged = 0
+rev = 'release'
+hook_add = '''
+" default install
+let g:coc_global_extensions = [
+    \'coc-clangd',
+    \]
+
+" Color of Error and Warning
+highlight CocErrorSign ctermfg=15 ctermbg=196
+highlight CocWarningSign ctermfg=0 ctermbg=172
+
+" Jump to the definition with \-d
+nnoremap <silent> <Leader>d :call CocAction('jumpDefinition')<CR>
+" Run format with \-fmt
+nnoremap <silent> <Leader>fmt :call CocAction('format')<CR>
+" Coc-quick-fix
+nnoremap <silent> <Leader>fx :call CocAction('doQuickfix')<CR>
+'''
+
+# ========== end cpp ==========
