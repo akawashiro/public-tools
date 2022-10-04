@@ -4,11 +4,11 @@ hook_add = '''
     noremap <Leader>at :AsyncRun ./test.sh<CR>
 '''
 
-[[plugins]]
-repo = 'neovim/nvim-lspconfig'
-
-[[plugins]]
-repo = 'JuliaEditorSupport/julia-vim'
+# [[plugins]]
+# repo = 'neovim/nvim-lspconfig'
+# 
+# [[plugins]]
+# repo = 'JuliaEditorSupport/julia-vim'
 
 [[plugins]]
 repo = 'tpope/vim-rhubarb'
@@ -18,12 +18,6 @@ repo = 'mechatroner/rainbow_csv'
 
 [[plugins]]
 repo = 'chrisbra/Colorizer'
-
-[[plugins]]
-repo = 'davidhalter/jedi-vim'
-
-[[plugins]]
-repo = 'tell-k/vim-autopep8'
 
 [[plugins]]
 repo = 'junegunn/fzf'
