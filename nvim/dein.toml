@@ -146,6 +146,10 @@ hook_source = '''
     nmap <silent> <leader>aa :A<CR>
 '''
 
+# ========== end cpp ==========
+
+# ========== start coc ==========
+
 [[plugins]]
 repo = 'neoclide/coc.nvim'
 merged = 0
@@ -154,6 +158,7 @@ hook_add = '''
 " default install
 let g:coc_global_extensions = [
     \'coc-clangd',
+    \'coc-pyright',
     \]
 
 " Color of Error and Warning
@@ -168,4 +173,4 @@ nnoremap <silent> <Leader>fmt :call CocAction('format')<CR>
 nnoremap <silent> <Leader>fx :call CocAction('doQuickfix')<CR>
 '''
 
-# ========== end cpp ==========
+# ========== end coc ==========
