@@ -184,6 +184,17 @@ nnoremap <silent> <Leader>d :call CocAction('jumpDefinition')<CR>
 nnoremap <silent> <Leader>fmt :call CocAction('format')<CR>
 " Coc-quick-fix
 nnoremap <silent> <Leader>fx :call CocAction('doQuickfix')<CR>
+
+" Use K to show documentation in preview window
+nnoremap <silent> <Leader>K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
 '''
 
 # ========== end coc ==========
