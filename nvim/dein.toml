@@ -33,6 +33,9 @@ build = './install --all'
 repo = 'junegunn/fzf.vim'
 depends = [ 'junegunn/fzf' ]
 hook_add = '''
+    let $FZF_DEFAULT_OPTS="--layout=reverse"
+    let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.9, 'height': 0.9,'yoffset':0.5,'xoffset': 0.75, 'border': 'sharp' } }
+
     command! -bang -nargs=* GCGrep call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 0, fzf#vim#with_preview({'options': ['--query', expand('<cword>')], 'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
 
     noremap <Leader>ff :Files<CR>
@@ -41,6 +44,15 @@ hook_add = '''
     noremap <Leader>fgc :GCGrep<CR>
     noremap <Leader>fa :Ag<CR>
     noremap <Leader>fb :Buffers<CR>
+'''
+
+[[plugins]]
+repo = 'antoinemadec/coc-fzf'
+depends = [ 'neoclide/coc.nvim' ]
+hook_add = '''
+    let g:coc_fzf_opts = ['--layout=reverse']
+    let g:coc_fzf_preview = 'right:50%'
+    noremap <Leader>fs :CocFzfList symbols<CR>
 '''
 
 [[plugins]]
@@ -136,6 +148,9 @@ hook_add = '''
     let g:airline_symbols.maxlinenr = ''
 '''
 
+[[plugins]]
+repo = 'rust-lang/rust.vim'
+
 # ========== start cpp ==========
 
 # Jump to the corresponding header or source file
@@ -154,6 +169,7 @@ hook_add = '''
 " default install
 let g:coc_global_extensions = [
     \'coc-clangd',
+    \'coc-rust-analyzer',
     \]
 
 " Color of Error and Warning

@@ -331,10 +331,15 @@ fpath=(~/.zsh/completion $fpath)
 # C-r Search history
 # C-t Search files under the current directory
 
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export FZF_TMUX=1
+export FZF_TMUX_OPTS="-p 80%"
+
 function fzf-checkout-branch() {
   local branches branch
   branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1)
-  branch=$(echo "$branches" | fzf --height 40% --reverse --preview "git show --color=always {}")
+  branch=$(echo "$branches" | fzf-tmux -p 80% --reverse --preview "git show --color=always {}")
   create_branch=$(echo "$branch" | sed -e "s:^remotes/origin/::")
   if [ "${branch}" = "${create_branch}" ]
   then
@@ -347,7 +352,7 @@ zle     -N   fzf-checkout-branch
 bindkey "^b" fzf-checkout-branch
 
 fzf-z-search() {
-    local res=$(z | sort -rn | cut -c 12- | fzf --height 40% --reverse)
+    local res=$(z | sort -rn | cut -c 12- | fzf-tmux -p 80% --reverse)
     if [ -n "$res" ]; then
         BUFFER+="cd $res"
         zle accept-line
@@ -359,9 +364,19 @@ fzf-z-search() {
 zle -N fzf-z-search
 bindkey '^z' fzf-z-search
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+fzf-r-history() {
+    local res=$(history 1000 | awk -e '{print $2}' | sort | uniq | fzf-tmux -p 80% --reverse)
+    if [ -n "$res" ]; then
+        BUFFER+="$res"
+    else
+        return 1
+    fi
+}
 
-########## fzf start ########## 
+zle -N fzf-r-history
+bindkey '^r' fzf-r-history
+
+########## fzf end ########## 
 
 ########## wonnix start ##########
 
