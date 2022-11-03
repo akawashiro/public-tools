@@ -376,6 +376,18 @@ fzf-r-history() {
 zle -N fzf-r-history
 bindkey '^r' fzf-r-history
 
+fzf-f-locate() {
+    local res=$(find / 2>/dev/null | fzf-tmux -p 80% --reverse)
+    if [ -n "$res" ]; then
+        BUFFER+="$res"
+    else
+        return 1
+    fi
+}
+
+zle -N fzf-f-locate
+bindkey '^f' fzf-f-locate
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
