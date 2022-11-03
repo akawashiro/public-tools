@@ -87,21 +87,11 @@ let g:deoplete#enable_at_startup = 1
 
 " ========== deoplete end ==========
 
-" ========== fzf start ==========
-
-" 'options': '--delimiter : --nth 3..' exist not to match with filenames
-
-command! -bang -nargs=* GGrep
-  \ call fzf#vim#grep(
-  \   'git grep --line-number -- '.shellescape(<q-args>), 0,
-  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0], 'options': '--delimiter : --nth 3..'}), <bang>0)
-command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 3..'}, <bang>0)
-
-" ========== fzf end ==========
-
 " ========== julia start ==========
 
 autocmd BufNewFile,BufRead *.jl setfiletype julia
+
+" ========== julia end ==========
 
 " ========== rhubarb.vim start ===========
 
@@ -110,20 +100,7 @@ let g:github_enterprise_urls = ['https://github.pfidev.jp']
 " ========== rhubarb.vim end ===========
 
 " ========== clang_format start ===========
+
 let g:clang_format#auto_format = 0
+
 " ========== clang_format end ===========
-
-" lua << EOF
-"     require'lspconfig'.julials.setup{}
-" EOF
-" 
-" autocmd Filetype julia setlocal omnifunc=v:lua.vim.lsp.omnifunc
-" 
-" nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
-" nnoremap <silent> gD    <cmd>lua vim.lsp.buf.declaration()()<CR>
-" nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
-" nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
-" nnoremap <silent> gi    <cmd>lua vim.lsp.buf.implementation()<CR>
-" nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
-
-" ========== julia end ==========

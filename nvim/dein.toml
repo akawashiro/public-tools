@@ -26,21 +26,30 @@ repo = 'chrisbra/Colorizer'
 repo = 'junegunn/fzf'
 build = './install --all'
 
+# Commands are copied from https://github.com/junegunn/fzf.vim/blob/9ceac718026fd39498d95ff04fa04d3e40c465d7/plugin/fzf.vim#L47-L69
 [[plugins]]
 repo = 'junegunn/fzf.vim'
 depends = [ 'junegunn/fzf' ]
 hook_add = '''
     let $FZF_DEFAULT_OPTS="--layout=reverse"
-    let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.9, 'height': 0.9,'yoffset':0.5,'xoffset': 0.75, 'border': 'sharp' } }
 
-    command! -bang -nargs=* GCGrep call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 0, fzf#vim#with_preview({'options': ['--query', expand('<cword>')], 'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
+    command!      -bang -nargs=? -complete=dir TmuxFiles       call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p80%'}), <bang>0)',
+    command!      -bang -nargs=? TmuxGitFiles                  call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p80%' } : {'tmux': '-p80%'}), <bang>0)',
+    command!      -bang -nargs=? TmuxGFiles                    call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p80%' } : {'tmux': '-p80%'}), <bang>0)',
+    command! -bar -bang -nargs=? -complete=buffer TmuxBuffers  call fzf#vim#buffers(<q-args>, fzf#vim#with_preview({ "placeholder": "{1}", 'tmux': '-p80%' }), <bang>0)',
+    command!      -bang -nargs=* TmuxAg                        call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p80%'}), <bang>0)',
+    command! -bang -nargs=* TmuxGCGrep call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 0, fzf#vim#with_preview({'options': ['--query', expand('<cword>')], 'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p80%'}), <bang>0)
+    command! -bang -nargs=* TmuxGGrep
+      \ call fzf#vim#grep(
+      \   'git grep --line-number -- '.shellescape(<q-args>), 0,
+      \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0], 'options': '--delimiter : --nth 3..', 'tmux': '-p80%'}), <bang>0)
 
-    noremap <Leader>ff :Files<CR>
-    noremap <Leader>fgf :GFiles<CR>
-    noremap <Leader>fgg :GGrep<CR>
-    noremap <Leader>fgc :GCGrep<CR>
-    noremap <Leader>fa :Ag<CR>
-    noremap <Leader>fb :Buffers<CR>
+    noremap <Leader>ff :TmuxFiles<CR>
+    noremap <Leader>fgf :TmuxGFiles<CR>
+    noremap <Leader>fgg :TmuxGGrep<CR>
+    noremap <Leader>fgc :TmuxGCGrep<CR>
+    noremap <Leader>fa :TmuxAg<CR>
+    noremap <Leader>fb :TmuxBuffers<CR>
 '''
 
 [[plugins]]
