@@ -1,14 +1,17 @@
-[[plugins]]
-repo = 'skywind3000/asyncrun.vim'
-hook_add = '''
-    noremap <Leader>at :AsyncRun ./test.sh<CR>
-'''
+# [[plugins]]
+# repo = 'skywind3000/asyncrun.vim'
+# hook_add = '''
+#     noremap <Leader>at :AsyncRun ./test.sh<CR>
+# '''
+#
+# [[plugins]]
+# repo = 'neovim/nvim-lspconfig'
+# 
+# [[plugins]]
+# repo = 'JuliaEditorSupport/julia-vim'
 
 [[plugins]]
-repo = 'neovim/nvim-lspconfig'
-
-[[plugins]]
-repo = 'JuliaEditorSupport/julia-vim'
+repo = 'easymotion/vim-easymotion'
 
 [[plugins]]
 repo = 'tpope/vim-rhubarb'
@@ -18,12 +21,6 @@ repo = 'mechatroner/rainbow_csv'
 
 [[plugins]]
 repo = 'chrisbra/Colorizer'
-
-[[plugins]]
-repo = 'davidhalter/jedi-vim'
-
-[[plugins]]
-repo = 'tell-k/vim-autopep8'
 
 [[plugins]]
 repo = 'junegunn/fzf'
@@ -161,6 +158,10 @@ hook_source = '''
     nmap <silent> <leader>aa :A<CR>
 '''
 
+# ========== end cpp ==========
+
+# ========== start coc ==========
+
 [[plugins]]
 repo = 'neoclide/coc.nvim'
 merged = 0
@@ -170,6 +171,7 @@ hook_add = '''
 let g:coc_global_extensions = [
     \'coc-clangd',
     \'coc-rust-analyzer',
+    \'coc-pyright',
     \]
 
 " Color of Error and Warning
@@ -184,4 +186,4 @@ nnoremap <silent> <Leader>fmt :call CocAction('format')<CR>
 nnoremap <silent> <Leader>fx :call CocAction('doQuickfix')<CR>
 '''
 
-# ========== end cpp ==========
+# ========== end coc ==========
