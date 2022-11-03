@@ -334,7 +334,6 @@ fpath=(~/.zsh/completion $fpath)
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_TMUX=1
-export FZF_TMUX_OPTS="-p 80%"
 
 function fzf-checkout-branch() {
   local branches branch
@@ -365,7 +364,7 @@ zle -N fzf-z-search
 bindkey '^z' fzf-z-search
 
 fzf-r-history() {
-    local res=$(history 1000 | awk -e '{print $2}' | sort | uniq | fzf-tmux -p 80% --reverse)
+    local res=$(history 1000 | awk -e '{ $1=""; print $0}' | sort | uniq | fzf-tmux -p 80% --reverse)
     if [ -n "$res" ]; then
         BUFFER+="$res"
     else
