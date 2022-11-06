@@ -31,7 +31,21 @@ build = './install --all'
 repo = 'junegunn/fzf.vim'
 depends = [ 'junegunn/fzf' ]
 hook_add = '''
-    let $FZF_DEFAULT_OPTS="--layout=reverse"
+    let $FZF_DEFAULT_OPTS="--layout=reverse --border"
+    let g:fzf_colors = {
+        \ 'fg':      ['fg', 'Normal'],   
+        \ 'bg':      ['bg', 'Normal'],   
+        \ 'hl':      ['fg', 'Comment'],   
+        \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],   
+        \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],   
+        \ 'hl+':     ['fg', 'Statement'],   
+        \ 'info':    ['fg', 'PreProc'],   
+        \ 'border':  ['fg', 'Keyword'],   
+        \ 'prompt':  ['fg', 'Conditional'],   
+        \ 'pointer': ['fg', 'Exception'],   
+        \ 'marker':  ['fg', 'Keyword'],   
+        \ 'spinner': ['fg', 'Label'],   
+        \ 'header':  ['fg', 'Comment'] }
 
     command!      -bang -nargs=? -complete=dir TmuxFiles       call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p80%'}), <bang>0)',
     command!      -bang -nargs=? TmuxGitFiles                  call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p80%' } : {'tmux': '-p80%'}), <bang>0)',
