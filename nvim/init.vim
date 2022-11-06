@@ -47,7 +47,7 @@ set expandtab
 set cindent
 syntax on
 
-colorscheme darkblue
+colorscheme desert
 
 set spell
 highlight clear SpellBad
