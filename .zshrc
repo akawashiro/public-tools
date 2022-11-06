@@ -334,6 +334,7 @@ fpath=(~/.zsh/completion $fpath)
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_TMUX=1
+export FZF_TMUX_OPTS="--reverse -p80%"
 
 function fzf-checkout-branch() {
   local branches branch
@@ -362,18 +363,6 @@ fzf-z-search() {
 
 zle -N fzf-z-search
 bindkey '^z' fzf-z-search
-
-fzf-r-history() {
-    local res=$(history 1000 | awk -e '{ $1=""; print $0}' | sort | uniq | fzf-tmux -p 80% --reverse)
-    if [ -n "$res" ]; then
-        BUFFER+="$res"
-    else
-        return 1
-    fi
-}
-
-zle -N fzf-r-history
-bindkey '^r' fzf-r-history
 
 fzf-f-locate() {
     local res=$(find / 2>/dev/null | fzf-tmux -p 80% --reverse)
