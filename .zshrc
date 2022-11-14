@@ -405,6 +405,32 @@ viewonnx() {
 
 ########## wonnix end ##########
 
+########## zenlog start ##########
+
+export ZENLOG_SRC_DIR=$HOME/src/zenlog/
+
+# Set up zenlog.
+# Note the following command does *not* start a zenlog session.
+# Type "zenlog" manually to start one, or change your terminal app's setting
+# to start zenlog instead of your login shell.
+#
+# Uncomment the following line to suppress zenlog default prompt.
+# ZENLOG_NO_DEFAULT_PROMPT=1
+#
+# Uncomment the following line to suppress zenlog default key bindings.
+# ZENLOG_NO_DEFAULT_BINDING=1
+#
+
+# Open log files in this command.
+ZENLOG_VIEWER=nvim
+
+# Open raw log in this command. (Requires A2H.)
+ZENLOG_RAW_VIEWER=google-chrome
+
+. <(zenlog basic-zsh-setup)
+
+########## zenlog end ##########
+
 ########## Load machine specific settings start ##########
 
 [ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
@@ -416,3 +442,7 @@ typeset -U PATH
 
 # Remove /bin from PATH
 export PATH=$(echo $PATH | sed -e "s|:/bin:|:|g"):/bin
+
+if which zenlog; then
+    zenlog
+fi
