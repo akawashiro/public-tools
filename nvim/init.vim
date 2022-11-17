@@ -266,15 +266,11 @@ let g:coc_global_extensions = [
 highlight CocErrorSign ctermfg=15 ctermbg=196
 highlight CocWarningSign ctermfg=0 ctermbg=172
 
-" Jump to the definition with \-d
-nmap <silent> <Leader>d <Plug>(coc-definition)
-" Run format with \-fmt
-nmap <silent> <Leader>fmt <Plug>(coc-format)
-" Coc-quick-fix
-nnoremap <silent> <Leader>fx <Plug>(coc-fix-current)
-
-" Use K to show documentation in preview window.
-nnoremap <silent> K :call ShowDocumentation()<CR>
+nmap <silent> <Leader>cd <Plug>(coc-definition)
+nmap <silent> <Leader>cr <Plug>(coc-references)
+nmap <silent> <Leader>cf <Plug>(coc-format)
+nmap <silent> <Leader>cx <Plug>(coc-fix-current)
+nnoremap <silent> <Leader>cs :call ShowDocumentation()<CR>
 
 function! ShowDocumentation()
   if CocAction('hasProvider', 'hover')
