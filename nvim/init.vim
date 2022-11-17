@@ -34,6 +34,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-scripts/a.vim', { 'for': ['c', 'cpp'] }
 
 call plug#end()
 
@@ -225,6 +226,35 @@ set updatetime=4000
 " diagnostics appear/become resolved.
 set signcolumn=yes
 
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: There's always complete item selected by default, you may want to enable
+" no select by `"suggest.noselect": true` in your configuration file.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+
 " default install
 " Installing coc-rust-analyzer causes some conflict with coc-clangd
 let g:coc_global_extensions = [
@@ -260,3 +290,16 @@ endfunction
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " ========== end coc ==========
+
+" ========== easymotion start ==========
+
+map <Leader>e <Plug>(easymotion-prefix)
+
+" ========== easymotion end ==========
+
+
+" ========== a.vim start ==========
+
+nmap <silent> <leader>aa :A<CR>
+
+" ========== a.vim end ==========
