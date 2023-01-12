@@ -77,6 +77,7 @@ alias gf="git fetch --all"
 alias gd="git diff"
 alias gr="git remote -v"
 alias gwip="git add -u && git commit -m \"WIP\" && git push origin `git rev-parse --abbrev-ref HEAD`"
+alias gist="gh gist create --public"
 
 function glm(){
     git fetch --all
@@ -344,9 +345,9 @@ function fzf-checkout-branch() {
   create_branch=$(echo "$branch" | sed -e "s:^remotes/origin/::")
   if [ "${branch}" = "${create_branch}" ]
   then
-    git switch ${branch}
+    git switch --detach ${branch}
   else
-    git switch --create ${create_branch} ${branch}
+    git switch --create ${create_branch} --track=${branch} ${branch}
   fi
 }
 zle     -N   fzf-checkout-branch
