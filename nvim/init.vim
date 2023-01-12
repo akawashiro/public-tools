@@ -260,6 +260,7 @@ endif
 let g:coc_global_extensions = [
     \'coc-clangd',
     \'coc-pyright',
+    \'coc-prettier',
     \]
 
 " Color of Error and Warning
