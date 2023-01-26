@@ -103,6 +103,13 @@ function gp(){
     git push origin $(git rev-parse --abbrev-ref HEAD)
 }
 
+function git-backup(){
+    local branchname=$(git rev-parse --abbrev-ref HEAD)
+    git branch ${branchname}-backup-$(date "+%Y%m%d%M%S")
+    git push origin ${branchname}-backup-$(date "+%Y%m%d%M%S")
+    git checkout ${branchname}
+}
+
 ########## git end ##########
 
 ########## kubectl start ##########
