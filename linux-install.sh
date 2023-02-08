@@ -8,7 +8,7 @@ BUILD_DIR=${HOME}/linux-build
 BRANCH_NAME=device-file-experiment
 USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
-# CONFIG_PATH=
+CONFIG_PATH=/boot/config-$(uname -r)
 
 # We should not install kernels with the same name
 pushd /boot
