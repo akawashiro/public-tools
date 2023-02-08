@@ -5,7 +5,7 @@
 
 LINUX_DIR=${HOME}/linux
 BUILD_DIR=${HOME}/linux-build
-BRANCH_NAME=malicious_interp
+BRANCH_NAME=device-file-experiment
 USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
 # CONFIG_PATH=
