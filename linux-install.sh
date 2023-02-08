@@ -10,6 +10,8 @@ USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
 CONFIG_PATH=/boot/config-$(uname -r)
 
+mkdir -p ${BUILD_DIR}
+
 # We should not install kernels with the same name
 pushd /boot
 if [ $(ls -1 | grep linux | wc -l) -ne 0 ]; then
@@ -32,7 +34,7 @@ cd ${LINUX_DIR}
 git fetch --all
 git checkout origin/${BRANCH_NAME}
 
-make clean
+# make clean
 
 # TODO: Want to use out-of-tree build
 # make CC="ccache gcc" O=${BUILD_DIR} olddefconfig 
