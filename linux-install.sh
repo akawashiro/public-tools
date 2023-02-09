@@ -13,6 +13,7 @@ USE_CPUS=$((USE_CPUS-2))
 CONFIG_PATH=/boot/config-$(uname -r)
 
 # Variable settings
+LINUX_REPOSITORY=${LINUX_REPOSITORY:-https://github.com/akawashiro/linux}
 BRANCH_NAME=${BRANCH_NAME:-device-file-experiment}
 INSTALL_PACKAGES=${INSTALL_PACKAGES:-no}
 DELETE_SAME_NAME_KERNELS=${DELETE_SAME_NAME_KERNELS:-no}
@@ -63,7 +64,7 @@ fi
 # Prepare source code
 if [[ ! -d "${LINUX_DIR}" ]]
 then
-    git clone https://github.com/akawashiro/linux.git "${LINUX_DIR}"
+    git clone "${LINUX_REPOSITORY}" "${LINUX_DIR}"
 fi
 pushd ${LINUX_DIR}
 git fetch --all --depth=1
