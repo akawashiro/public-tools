@@ -6,11 +6,8 @@
 #   to build and install Linux kernel
 
 # Constant settings
-LINUX_DIR=${HOME}/linux
-BUILD_DIR=${HOME}/linux-build
 USE_CPUS=$(nproc --all)
 USE_CPUS=$((USE_CPUS-2))
-CONFIG_PATH=/boot/config-$(uname -r)
 
 # Variable settings
 LINUX_REPOSITORY=${LINUX_REPOSITORY:-https://github.com/akawashiro/linux}
@@ -19,6 +16,9 @@ INSTALL_PACKAGES=${INSTALL_PACKAGES:-no}
 DELETE_SAME_NAME_KERNELS=${DELETE_SAME_NAME_KERNELS:-no}
 INSTALL_BUILT_KERNEL=${INSTALL_BUILT_KERNEL:-no}
 REBOOT_AFTER_INSTALL=${REBOOT_AFTER_INSTALL:-no}
+CONFIG_PATH=${CONFIG_PATH:-/boot/config-$(uname -r)}
+LINUX_DIR=${LINUX_DIR:-${HOME}/linux}
+BUILD_DIR=${BUILD_DIR:-${HOME}/linux-build}
 
 # Check inputs
 if [[ "${INSTALL_PACKAGES}" != yes ]] && [[ "${INSTALL_PACKAGES}" != no ]]
