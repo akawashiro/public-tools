@@ -87,16 +87,16 @@ popd
 pushd "${LINUX_DIR}"
 bear -- make olddefconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
 bear -- make LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
-popd
 
 # Install Linux kernel
 if [[ "${INSTALL_BUILT_KERNEL}" == yes ]]
 then
-    sudo make modules_install
-    sudo make install
+    sudo make modules_install O="${BUILD_DIR}"
+    sudo make install O="${BUILD_DIR}"
 
     if [[ "${REBOOT_AFTER_INSTALL}" == yes ]]
     then
         sudo reboot now
     fi
 fi
+popd
