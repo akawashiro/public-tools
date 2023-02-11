@@ -75,17 +75,17 @@ popd
 mkdir -p "${BUILD_DIR}"
 pushd "${BUILD_DIR}"
 
-cp "${CONFIG_PATH}" "${BUILD_DIR}"/.config
-cat .config | \
-    sed -e "s/CONFIG_SYSTEM_TRUSTED_KEYS=".*"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/g" | \
-    sed -e "s/CONFIG_SYSTEM_REVOCATION_KEYS=".*"/CONFIG_SYSTEM_REVOCATION_KEYS=\"\"/g" \
-    > .config.bak
-cp .config.bak .config
+# cp "${CONFIG_PATH}" "${BUILD_DIR}"/.config
+# cat .config | \
+#     sed -e "s/CONFIG_SYSTEM_TRUSTED_KEYS=".*"/CONFIG_SYSTEM_TRUSTED_KEYS=\"\"/g" | \
+#     sed -e "s/CONFIG_SYSTEM_REVOCATION_KEYS=".*"/CONFIG_SYSTEM_REVOCATION_KEYS=\"\"/g" \
+#     > .config.bak
+# cp .config.bak .config
 popd
 
 # Build Linux kernel
 pushd "${LINUX_DIR}"
-bear -- make olddefconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
+bear -- make defconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
 bear -- make kvm_guest.config LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
 bear -- make LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
 
