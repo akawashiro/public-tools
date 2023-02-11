@@ -86,7 +86,7 @@ popd
 # Build Linux kernel
 pushd "${LINUX_DIR}"
 bear -- make olddefconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
-bear -- make kvmconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
+bear -- make kvm_guest.config LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
 bear -- make LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
 
 # Install Linux kernel
