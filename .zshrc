@@ -353,12 +353,18 @@ function fzf-checkout-branch() {
   local branches branch
   branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1)
   branch=$(echo "$branches" | fzf-tmux -p 80% --reverse --preview "git show --color=always {}")
-  create_branch=$(echo "$branch" | sed -e "s:^remotes/origin/::")
-  if [ "${branch}" = "${create_branch}" ]
+
+  local_branch=$(echo "$branch" | sed -e "s:^remotes/::")
+  create_origin_branch=$(echo "$branch" | sed -e "s:^remotes/origin/::")
+
+  if [[ "${branch}" == "${local_branch}" ]]
+  then
+    git switch ${branch}
+  elif [[ "${branch}" == "${create_origin_branch}" ]]
   then
     git switch --detach ${branch}
   else
-    git switch --create ${create_branch} --track=${branch} ${branch}
+    git switch --create ${create_origin_branch} --track=${branch} ${branch}
   fi
 }
 zle     -N   fzf-checkout-branch
