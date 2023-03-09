@@ -364,7 +364,7 @@ function fzf-checkout-branch() {
   then
     git switch --detach ${branch}
   else
-    git switch --create ${create_origin_branch} --track=${branch} ${branch}
+    git switch --create ${create_origin_branch} ${branch}
   fi
 }
 zle     -N   fzf-checkout-branch
