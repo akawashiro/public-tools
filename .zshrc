@@ -90,17 +90,33 @@ function glm(){
     if [ ! -z "${is_master}" ]; then
         git checkout master
         git merge upstream/master
-    elif [ ! -z "${is_main}" ]; then 
+    elif [ ! -z "${is_main}" ]; then
         git checkout main
         git merge upstream/main
     else
         echo "Cannot find master or main branch."
-        exit 1
+    fi
+}
+
+function grm(){
+    git fetch --all
+    local is_master=$(git branch --all | grep upstream/master)
+    local is_main=$(git branch --all | grep upstream/main)
+    if [ ! -z "${is_master}" ]; then
+        git rebase upstream/master
+    elif [ ! -z "${is_main}" ]; then
+        git rebase upstream/main
+    else
+        echo "Cannot find master or main branch."
     fi
 }
 
 function gp(){
     git push origin $(git rev-parse --abbrev-ref HEAD)
+}
+
+function gpf(){
+    git push origin $(git rev-parse --abbrev-ref HEAD) --force-with-lease --force-if-includes
 }
 
 function git-backup(){
