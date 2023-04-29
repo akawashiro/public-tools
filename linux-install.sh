@@ -11,7 +11,7 @@ USE_CPUS=$((USE_CPUS-2))
 
 # Variable settings
 LINUX_REPOSITORY=${LINUX_REPOSITORY:-https://github.com/akawashiro/linux}
-BRANCH_NAME=${BRANCH_NAME:-device-file-experiment}
+BRANCH_NAME=${BRANCH_NAME:-check-fd-passing}
 INSTALL_PACKAGES=${INSTALL_PACKAGES:-no}
 DELETE_SAME_NAME_KERNELS=${DELETE_SAME_NAME_KERNELS:-no}
 INSTALL_BUILT_KERNEL=${INSTALL_BUILT_KERNEL:-no}
@@ -85,9 +85,9 @@ popd
 
 # Build Linux kernel
 pushd "${LINUX_DIR}"
-bear -- make defconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
-bear -- make kvm_guest.config LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" O="${BUILD_DIR}"
-bear -- make LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache gcc" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
+bear -- make defconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache clang" O="${BUILD_DIR}"
+bear -- make kvm_guest.config LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache clang" O="${BUILD_DIR}"
+bear -- make LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache clang" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
 
 # Install Linux kernel
 if [[ "${INSTALL_BUILT_KERNEL}" == yes ]]
