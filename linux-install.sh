@@ -45,6 +45,15 @@ then
     sudo apt-get -y install libncurses-dev gawk flex bison openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev libiberty-dev autoconf git ccache dwarves cmake bear
 fi
 
+# Sometimes you must delete all obsoluted kernels before install new one.
+# pushd /boot
+# ls -1 | grep "device-file-experiment" | xargs sudo rm
+# popd
+# pushd /lib/modules
+# ls -1 | grep "device-file-experiment" | xargs sudo rm -r
+# sudo update-grub
+# popd
+
 # We should not install kernels with the same name
 if [[ "${DELETE_SAME_NAME_KERNELS}" == yes ]]
 then
