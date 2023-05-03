@@ -443,6 +443,7 @@ viewonnx() {
 ########## zenlog start ##########
 
 export ZENLOG_SRC_DIR=$HOME/src/zenlog/
+export ZENLOG_DIR=/tmp/zenlog-dir/
 
 # Set up zenlog.
 # Note the following command does *not* start a zenlog session.
