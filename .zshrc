@@ -411,6 +411,17 @@ fzf-f-locate() {
 zle -N fzf-f-locate
 bindkey '^f' fzf-f-locate
 
+function ghq-fzf() {
+  local src=$(ghq list | fzf-tmux -p 80% --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
+  if [ -n "$src" ]; then
+    BUFFER="cd $(ghq root)/$src"
+    zle accept-line
+  fi
+  zle -R -c
+}
+zle -N ghq-fzf
+bindkey '^]' ghq-fzf
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
