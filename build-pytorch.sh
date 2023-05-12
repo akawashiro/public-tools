@@ -1,15 +1,18 @@
 #! /bin/bash -eux
 
 # git clone --branch v1.13.0 git@github.com:pytorch/pytorch.git pytorch
-# pushd pytorch
-# git submodule update --init --recursive
-# popd
 
-BUILD_DIR=$(pwd)/pytorch-build
-INSTALL_DIR=$(pwd)/pytorch-install
+SOURCE_DIR=$(ghq list -p | grep pytorch | head -n 1)
+BUILD_DIR=${HOME}/tmp/pytorch-build
+INSTALL_DIR=${HOME}/tmp/pytorch-install
 mkdir -p ${BUILD_DIR}
 mkdir -p ${INSTALL_DIR}
-cmake -S pytorch -B ${BUILD_DIR} -G Ninja \
+
+pushd ${SOURCE_DIR}
+git submodule update --init --recursive
+popd
+
+cmake -S ${SOURCE_DIR} -B ${BUILD_DIR} -G Ninja \
     -DBUILD_SHARED_LIBS:BOOL=ON \
     -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
     -DPYTHON_EXECUTABLE:PATH=`which python3` \
@@ -21,4 +24,4 @@ cmake -S pytorch -B ${BUILD_DIR} -G Ninja \
     -DUSE_NNPACK=OFF \
     -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
     -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR}
-cmake --build pytorch-build -- -j12 install
+cmake --build ${BUILD_DIR} -- -j12 install
