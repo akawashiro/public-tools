@@ -18,7 +18,7 @@ INSTALL_BUILT_KERNEL=${INSTALL_BUILT_KERNEL:-no}
 REBOOT_AFTER_INSTALL=${REBOOT_AFTER_INSTALL:-no}
 CONFIG_PATH=${CONFIG_PATH:-/boot/config-$(uname -r)}
 LINUX_DIR=${LINUX_DIR:-${HOME}/linux}
-BUILD_DIR=${BUILD_DIR:-${HOME}/linux-build}
+BUILD_DIR=${BUILD_DIR:-${HOME}/tmp/linux-build}
 
 # Check inputs
 if [[ "${INSTALL_PACKAGES}" != yes ]] && [[ "${INSTALL_PACKAGES}" != no ]]
