@@ -80,6 +80,7 @@ alias gc="git checkout -b"
 alias gf="git fetch --all"
 alias gd="git diff"
 alias gr="git remote -v"
+alias gcm="git commit -m"
 alias gwip="git add -u && git commit -m \"WIP\" && git push origin `git rev-parse --abbrev-ref HEAD`"
 alias gist="gh gist create --public"
 
