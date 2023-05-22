@@ -357,7 +357,7 @@ fpath=(~/.zsh/completion $fpath)
 ########### OCaml end ##########
 
 ########## fzf start ########## 
-# C-b checkout branch
+# C-v checkout branch
 # C-r Search history
 # C-t Search files under the current directory
 
@@ -385,7 +385,7 @@ function fzf-checkout-branch() {
   fi
 }
 zle     -N   fzf-checkout-branch
-bindkey "^b" fzf-checkout-branch
+bindkey "^v" fzf-checkout-branch
 
 fzf-z-search() {
     local res=$(z | sort -rn | cut -c 12- | fzf-tmux -p 80% --reverse)
