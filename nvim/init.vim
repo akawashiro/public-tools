@@ -86,6 +86,9 @@ set hidden
 
 set completeopt=menuone
 
+" Search selected words with * even if in visual mode
+vnoremap <silent> * "vy/\V<C-r>=substitute(escape(@v,'\/'),"\n",'\\n','g')<CR><CR>
+
 " ========== nvim end ==========
 
 " ========== deoplete start ==========
