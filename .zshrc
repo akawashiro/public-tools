@@ -467,7 +467,6 @@ export ZENLOG_DIR=/tmp/zenlog-dir/
 #
 # Uncomment the following line to suppress zenlog default key bindings.
 # ZENLOG_NO_DEFAULT_BINDING=1
-#
 
 # Open log files in this command.
 ZENLOG_VIEWER=nvim
@@ -476,6 +475,13 @@ ZENLOG_VIEWER=nvim
 ZENLOG_RAW_VIEWER=google-chrome
 
 . <(zenlog basic-zsh-setup)
+
+zenlog_gh_gist_last_cmd() {
+    gh gist create --public $(realpath /tmp/zenlog/$(hostname)/S)
+}
+
+zle -N zenlog_gh_gist_last_cmd
+bindkey '^[5' zenlog_gh_gist_last_cmd
 
 ########## zenlog end ##########
 
