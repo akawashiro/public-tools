@@ -162,7 +162,7 @@ function preexec() {
 
 setopt PROMPT_SUBST
 PROMPT='%{${fg[green]}%}[@%m]%{${reset_color}%}${vcs_info_msg_0_}${PWD/#$HOME/~}
-> '
+$ '
 
 function precmd() {
   if [ $timer ]; then
