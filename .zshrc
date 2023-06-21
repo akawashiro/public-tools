@@ -477,7 +477,7 @@ ZENLOG_RAW_VIEWER=google-chrome
 . <(zenlog basic-zsh-setup)
 
 zenlog_gh_gist_last_cmd() {
-    gh gist create --public $(realpath /tmp/zenlog/$(hostname)/S)
+    gh gist create --public $(realpath ${ZENLOG_DIR}/S)
 }
 
 zle -N zenlog_gh_gist_last_cmd
