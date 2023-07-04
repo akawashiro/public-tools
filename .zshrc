@@ -45,6 +45,7 @@ stty werase undef
 source ~/.zplug/init.zsh
 
 zplug "rupa/z", use:z.sh
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
 
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
