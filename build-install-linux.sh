@@ -17,7 +17,7 @@ DELETE_SAME_NAME_KERNELS=${DELETE_SAME_NAME_KERNELS:-no}
 INSTALL_BUILT_KERNEL=${INSTALL_BUILT_KERNEL:-no}
 REBOOT_AFTER_INSTALL=${REBOOT_AFTER_INSTALL:-no}
 CONFIG_PATH=${CONFIG_PATH:-/boot/config-$(uname -r)}
-LINUX_DIR=${LINUX_DIR:-${HOME}/linux}
+LINUX_DIR=${LINUX_DIR:-$(ghq root)/github.com/akawashiro/linux}
 BUILD_DIR=${BUILD_DIR:-${HOME}/tmp/linux-build}
 
 # Check inputs
