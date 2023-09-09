@@ -130,18 +130,6 @@ function git-backup(){
 
 ########## git end ##########
 
-########## kubectl start ##########
-
-alias kgp="pf kubectl get pod"
-alias kgj="pf kubectl get job"
-alias kd="pf kubectl describe"
-alias kdp="pf kubectl describe pod"
-alias kdj="pf kubectl describe job"
-alias klf="pf kubectl logs -f"
-alias delete-succeeded-jobs="kubectl delete jobs --field-selector status.successful=1"
-
-########## kubectl end ##########
-
 ########## PROMPT start ##########
 # vcs_info
 autoload -Uz vcs_info
