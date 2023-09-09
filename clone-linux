@@ -1,12 +1,7 @@
 #!/bin/bash -eux
 
-if [ $# -ne 1 ]; then
-    echo "You must specify the target directory."
-    exit 1
-fi
-
-git clone git@github.com:akawashiro/linux.git $1
-cd $1
+ghq get git@github.com:akawashiro/linux.git
+cd $(ghq root)/github.com/akawashiro/linux
 git remote add torvalds git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 git remote add focal git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/focal
 git remote add linux-next https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
