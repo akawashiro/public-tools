@@ -16,6 +16,7 @@ export PATH=$HOME/.fzf/bin:$PATH
 export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 
 export NVM_DIR="$HOME/.nvm"
@@ -423,6 +424,12 @@ function ghq-fzf() {
 }
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
+
+function ghsearch-fzf() {
+  ghsearch emit | fzf-tmux -p 80% --reverse --preview 'ghsearch preview {} {q}' | xargs -I{} ghsearch open {}
+}
+zle -N ghsearch-fzf
+bindkey '^g' ghsearch-fzf
 
 ########## fzf end ########## 
 
