@@ -13,6 +13,7 @@ export PATH=$HOME/.go/bin:$PATH
 export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH=$HOME/.fzf/bin:$PATH
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 # export PATH="$PYENV_ROOT/bin:$PATH"
 
 # export PYENV_ROOT="$HOME/.pyenv"
