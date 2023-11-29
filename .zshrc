@@ -16,8 +16,10 @@ export PATH=$HOME/.fzf/bin:$PATH
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 # export PATH="$PYENV_ROOT/bin:$PATH"
 
-# export PYENV_ROOT="$HOME/.pyenv"
-# eval "$(pyenv init -)"
+export PYENV_ROOT="$HOME/.pyenv"
+eval "$(pyenv init -)"
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -46,6 +48,7 @@ stty werase undef
 source ~/.zplug/init.zsh
 
 zplug "rupa/z", use:z.sh
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
 
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
@@ -129,18 +132,6 @@ function git-backup(){
 }
 
 ########## git end ##########
-
-########## kubectl start ##########
-
-alias kgp="pf kubectl get pod"
-alias kgj="pf kubectl get job"
-alias kd="pf kubectl describe"
-alias kdp="pf kubectl describe pod"
-alias kdj="pf kubectl describe job"
-alias klf="pf kubectl logs -f"
-alias delete-succeeded-jobs="kubectl delete jobs --field-selector status.successful=1"
-
-########## kubectl end ##########
 
 ########## PROMPT start ##########
 # vcs_info
@@ -424,6 +415,12 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
+function ghsearch-fzf() {
+  ghsearch emit | fzf-tmux -p 80% --reverse --preview 'ghsearch preview {} {q}' | xargs -I{} ghsearch open {}
+}
+zle -N ghsearch-fzf
+bindkey '^g' ghsearch-fzf
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
@@ -478,7 +475,7 @@ ZENLOG_RAW_VIEWER=google-chrome
 . <(zenlog basic-zsh-setup)
 
 zenlog_gh_gist_last_cmd() {
-    gh gist create --public $(realpath /tmp/zenlog/$(hostname)/S)
+    gh gist create --public $(realpath ${ZENLOG_DIR}/S)
 }
 
 zle -N zenlog_gh_gist_last_cmd
