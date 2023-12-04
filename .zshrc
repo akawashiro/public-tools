@@ -213,8 +213,6 @@ zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
 # ps コマンドのプロセス名補完
 zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
 
-
-########################################
 # オプション
 # 日本語ファイル名を表示可能にする
 setopt print_eight_bit
@@ -254,7 +252,6 @@ setopt hist_reduce_blanks
 # 高機能なワイルドカード展開を使用する
 setopt extended_glob
 
-########################################
 # キーバインド
 
 # ^R で履歴検索をするときに * でワイルドカードを使用出来るようにする
@@ -292,10 +289,6 @@ alias -g ....='../../..'
 
 ########## alias end ##########
 
-# kubernetes
-# [ -f $HOME/tools/.kubectl_aliases ] && source $HOME/tools/.kubectl_aliases
-# source <(kubectl completion zsh)
-
 ############ Copy to stdout to clipboard start ############
 # mollifier delta blog : http://mollifier.hatenablog.com/entry/20100317/p1
 
@@ -312,8 +305,8 @@ fi
 
 ############ Copy to stdout to clipboard end ############
 
-########################################
-# OS specific settings
+########### OS specific settings start ##########
+
 case ${OSTYPE} in
     darwin*)
         export CLICOLOR=1
@@ -323,6 +316,8 @@ case ${OSTYPE} in
         alias ls='ls -F --color=auto'
         ;;
 esac
+
+########### OS specific settings end ##########
 
 ########### Haskell start ##########
 
