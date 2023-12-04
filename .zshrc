@@ -489,11 +489,26 @@ bindkey '^[5' zenlog_gh_gist_last_cmd
 
 ########## Load machine specific settings end ##########
 
-# Remove duplicated entry from PATH
+########## Remove duplicated entry from PATH start ###########
+
 typeset -U PATH
 
-# Remove /bin from PATH
+########## Remove duplicated entry from PATH end ###########
+
+########## Remove /bin from PATH start ############
+
 export PATH=$(echo $PATH | sed -e "s|:/bin:|:|g"):/bin
+
+########## Remove /bin from PATH end ############
+
+########## ssh-agent start #########
+
+if [[ -f ~/.ssh/id_rsa ]]; then
+    eval $(ssh-agent -s) > /dev/null
+    ssh-add ~/.ssh/id_rsa
+fi
+
+########## ssh-agent end #########
 
 if which zenlog; then
     zenlog
