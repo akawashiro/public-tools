@@ -14,10 +14,13 @@ export PATH=$HOME/.go/bin:$PATH
 export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH=$HOME/.fzf/bin:$PATH
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+# export PATH="$PYENV_ROOT/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -46,6 +49,7 @@ stty werase undef
 source ~/.zplug/init.zsh
 
 zplug "rupa/z", use:z.sh
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
 
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
@@ -130,18 +134,6 @@ function git-backup(){
 
 ########## git end ##########
 
-########## kubectl start ##########
-
-alias kgp="pf kubectl get pod"
-alias kgj="pf kubectl get job"
-alias kd="pf kubectl describe"
-alias kdp="pf kubectl describe pod"
-alias kdj="pf kubectl describe job"
-alias klf="pf kubectl logs -f"
-alias delete-succeeded-jobs="kubectl delete jobs --field-selector status.successful=1"
-
-########## kubectl end ##########
-
 ########## PROMPT start ##########
 # vcs_info
 autoload -Uz vcs_info
@@ -222,8 +214,6 @@ zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
 # ps コマンドのプロセス名補完
 zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
 
-
-########################################
 # オプション
 # 日本語ファイル名を表示可能にする
 setopt print_eight_bit
@@ -263,7 +253,6 @@ setopt hist_reduce_blanks
 # 高機能なワイルドカード展開を使用する
 setopt extended_glob
 
-########################################
 # キーバインド
 
 # ^R で履歴検索をするときに * でワイルドカードを使用出来るようにする
@@ -301,10 +290,6 @@ alias -g ....='../../..'
 
 ########## alias end ##########
 
-# kubernetes
-# [ -f $HOME/tools/.kubectl_aliases ] && source $HOME/tools/.kubectl_aliases
-# source <(kubectl completion zsh)
-
 ############ Copy to stdout to clipboard start ############
 # mollifier delta blog : http://mollifier.hatenablog.com/entry/20100317/p1
 
@@ -321,8 +306,8 @@ fi
 
 ############ Copy to stdout to clipboard end ############
 
-########################################
-# OS specific settings
+########### OS specific settings start ##########
+
 case ${OSTYPE} in
     darwin*)
         export CLICOLOR=1
@@ -332,6 +317,8 @@ case ${OSTYPE} in
         alias ls='ls -F --color=auto'
         ;;
 esac
+
+########### OS specific settings end ##########
 
 ########### Haskell start ##########
 
@@ -424,6 +411,12 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
+function ghsearch-fzf() {
+  ghsearch emit | fzf-tmux -p 80% --reverse --preview 'ghsearch preview {} {q}' | xargs -I{} ghsearch open {}
+}
+zle -N ghsearch-fzf
+bindkey '^g' ghsearch-fzf
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
@@ -492,11 +485,26 @@ bindkey '^[5' zenlog_gh_gist_last_cmd
 
 ########## Load machine specific settings end ##########
 
-# Remove duplicated entry from PATH
+########## Remove duplicated entry from PATH start ###########
+
 typeset -U PATH
 
-# Remove /bin from PATH
+########## Remove duplicated entry from PATH end ###########
+
+########## Remove /bin from PATH start ############
+
 export PATH=$(echo $PATH | sed -e "s|:/bin:|:|g"):/bin
+
+########## Remove /bin from PATH end ############
+
+########## ssh-agent start #########
+
+if [[ -f ~/.ssh/id_rsa ]]; then
+    eval $(ssh-agent -s) > /dev/null
+    ssh-add ~/.ssh/id_rsa
+fi
+
+########## ssh-agent end #########
 
 if which zenlog; then
     zenlog
