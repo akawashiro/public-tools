@@ -5,6 +5,7 @@ export LANG=en_US.UTF-8
 export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
+export PATH=$HOME/.local/sbin:$PATH
 export PATH=$HOME/pfn-tools:$PATH
 export PATH=$HOME/public-tools:$PATH
 export PATH=$HOME/tools:$PATH
@@ -13,10 +14,10 @@ export PATH=$HOME/.go/bin:$PATH
 export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH=$HOME/.fzf/bin:$PATH
-# export PATH="$PYENV_ROOT/bin:$PATH"
 
-# export PYENV_ROOT="$HOME/.pyenv"
-# eval "$(pyenv init -)"
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
