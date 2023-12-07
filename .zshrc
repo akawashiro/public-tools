@@ -5,6 +5,7 @@ export LANG=en_US.UTF-8
 export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
+export PATH=$HOME/.local/sbin:$PATH
 export PATH=$HOME/pfn-tools:$PATH
 export PATH=$HOME/public-tools:$PATH
 export PATH=$HOME/tools:$PATH
@@ -508,3 +509,11 @@ fi
 if which zenlog; then
     zenlog
 fi
+
+# Wasmer
+export WASMER_DIR="/home/akira/.wasmer"
+[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
+
+export WASMTIME_HOME="$HOME/.wasmtime"
+
+export PATH="$WASMTIME_HOME/bin:$PATH"
