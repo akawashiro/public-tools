@@ -412,6 +412,12 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
+function ghsearch-fzf() {
+  ghsearch emit | fzf-tmux -p 80% --reverse --preview 'ghsearch preview {} {q}' --preview-window=,~2 | xargs -I{} ghsearch open {}
+}
+zle -N ghsearch-fzf
+bindkey '^g' ghsearch-fzf
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
