@@ -10,12 +10,13 @@ export PATH=$HOME/pfn-tools:$PATH
 export PATH=$HOME/public-tools:$PATH
 export PATH=$HOME/tools:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
-export PATH=$HOME/.go/bin:$PATH
-export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH=$HOME/.fzf/bin:$PATH
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 # export PATH="$PYENV_ROOT/bin:$PATH"
+
+export GOPATH="$HOME/.go"
+export PATH="$GOPATH/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
@@ -27,8 +28,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
-
-export GOPATH="$HOME/.go"
 
 export CROPASS_PASS_DIR="$HOME/Dropbox/cropass-encrypted-passwords"
 
