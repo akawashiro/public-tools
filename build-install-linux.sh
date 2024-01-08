@@ -11,7 +11,7 @@ USE_CPUS=$((USE_CPUS-2))
 
 # Variable settings
 LINUX_REPOSITORY=${LINUX_REPOSITORY:-https://github.com/akawashiro/linux}
-BRANCH_NAME=${BRANCH_NAME:-check-fd-passing}
+BRANCH_NAME=${BRANCH_NAME:-v6.6}
 INSTALL_PACKAGES=${INSTALL_PACKAGES:-no}
 DELETE_SAME_NAME_KERNELS=${DELETE_SAME_NAME_KERNELS:-no}
 INSTALL_BUILT_KERNEL=${INSTALL_BUILT_KERNEL:-no}
@@ -77,7 +77,7 @@ then
 fi
 pushd ${LINUX_DIR}
 git fetch --all --depth=1
-git checkout origin/${BRANCH_NAME}
+git checkout ${BRANCH_NAME}
 popd
 
 # Prepare build dir

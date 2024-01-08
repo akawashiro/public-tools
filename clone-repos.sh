@@ -1,5 +1,8 @@
 #! /bin/bash -ux
 
+export GOPATH="$HOME/.go"
+export PATH="$GOPATH/.bin:$PATH"
+
 ghq get git@github.com:akawashiro/misc.git
 
 ghq get git@github.com:akawashiro/sold.git

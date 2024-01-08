@@ -35,6 +35,8 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'vim-scripts/a.vim', { 'for': ['c', 'cpp'] }
+Plug 'dhruvasagar/vim-table-mode'
+Plug 'github/copilot.vim'
 
 call plug#end()
 
