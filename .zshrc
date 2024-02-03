@@ -5,26 +5,29 @@ export LANG=en_US.UTF-8
 export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
+export PATH=$HOME/.local/sbin:$PATH
 export PATH=$HOME/pfn-tools:$PATH
 export PATH=$HOME/public-tools:$PATH
 export PATH=$HOME/tools:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
-export PATH=$HOME/.go/bin:$PATH
-export PATH="$GOPATH/.bin:$PATH"
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH=$HOME/.fzf/bin:$PATH
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+# export PATH="$PYENV_ROOT/bin:$PATH"
+
+export GOPATH="$HOME/.go"
+export PATH="$GOPATH/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
-
-export GOPATH="$HOME/.go"
 
 export CROPASS_PASS_DIR="$HOME/Dropbox/cropass-encrypted-passwords"
 
@@ -210,8 +213,6 @@ zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
 # ps コマンドのプロセス名補完
 zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
 
-
-########################################
 # オプション
 # 日本語ファイル名を表示可能にする
 setopt print_eight_bit
@@ -251,7 +252,6 @@ setopt hist_reduce_blanks
 # 高機能なワイルドカード展開を使用する
 setopt extended_glob
 
-########################################
 # キーバインド
 
 # ^R で履歴検索をするときに * でワイルドカードを使用出来るようにする
@@ -289,10 +289,6 @@ alias -g ....='../../..'
 
 ########## alias end ##########
 
-# kubernetes
-# [ -f $HOME/tools/.kubectl_aliases ] && source $HOME/tools/.kubectl_aliases
-# source <(kubectl completion zsh)
-
 ############ Copy to stdout to clipboard start ############
 # mollifier delta blog : http://mollifier.hatenablog.com/entry/20100317/p1
 
@@ -309,8 +305,8 @@ fi
 
 ############ Copy to stdout to clipboard end ############
 
-########################################
-# OS specific settings
+########### OS specific settings start ##########
+
 case ${OSTYPE} in
     darwin*)
         export CLICOLOR=1
@@ -320,6 +316,8 @@ case ${OSTYPE} in
         alias ls='ls -F --color=auto'
         ;;
 esac
+
+########### OS specific settings end ##########
 
 ########### Haskell start ##########
 
@@ -412,6 +410,12 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
+function ghsearch-fzf() {
+  ghsearch emit | fzf-tmux -p 80% --reverse --preview 'ghsearch preview {} {q}' --preview-window=,~2 | xargs -I{} ghsearch open {}
+}
+zle -N ghsearch-fzf
+bindkey '^g' ghsearch-fzf
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
@@ -480,12 +484,35 @@ bindkey '^[5' zenlog_gh_gist_last_cmd
 
 ########## Load machine specific settings end ##########
 
-# Remove duplicated entry from PATH
+########## Remove duplicated entry from PATH start ###########
+
 typeset -U PATH
 
-# Remove /bin from PATH
+########## Remove duplicated entry from PATH end ###########
+
+########## Remove /bin from PATH start ############
+
 export PATH=$(echo $PATH | sed -e "s|:/bin:|:|g"):/bin
+
+########## Remove /bin from PATH end ############
+
+########## ssh-agent start #########
+
+if [[ -f ~/.ssh/id_rsa ]]; then
+    eval $(ssh-agent -s) > /dev/null
+    ssh-add ~/.ssh/id_rsa
+fi
+
+########## ssh-agent end #########
 
 if which zenlog; then
     zenlog
 fi
+
+# Wasmer
+export WASMER_DIR="/home/akira/.wasmer"
+[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
+
+export WASMTIME_HOME="$HOME/.wasmtime"
+
+export PATH="$WASMTIME_HOME/bin:$PATH"
