@@ -126,9 +126,11 @@ function gpf(){
 
 function git-backup(){
     local branchname=$(git rev-parse --abbrev-ref HEAD)
-    git branch ${branchname}-backup-$(date "+%Y%m%d%M%S")
-    git push origin ${branchname}-backup-$(date "+%Y%m%d%M%S")
-    git checkout ${branchname}
+    local backup=${branchname}-backup-$(date "+%Y%m%d%M%S")
+    git branch ${backup}
+    git push origin ${backup}
+    git checkout ${backup}
+    git branch -D ${branchname}
 }
 
 ########## git end ##########
