@@ -505,6 +505,14 @@ fi
 
 ########## ssh-agent end #########
 
+########## gpg-agent start #########
+
+# gpg --export-ssh-key <key-id> to get the public key
+gpg-agent --daemon --enable-ssh-support
+export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+########## gpg-agent end #########
+
 if which zenlog; then
     zenlog
 fi
