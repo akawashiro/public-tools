@@ -500,20 +500,21 @@ export PATH=$(echo $PATH | sed -e "s|:/bin:|:|g"):/bin
 
 ########## ssh-agent start #########
 
-if [[ -f ~/.ssh/id_rsa ]]; then
-    eval $(ssh-agent -s) > /dev/null
-    ssh-add ~/.ssh/id_rsa
+if [[ "$(gpg --list-secret-keys | grep 3FB4269CA58D57F0326C1F7488737135568C1AC5 | wc -l)" == "1" ]]; then
+    echo "Setup ssh-agent with gpg-agent because I found the gpg key."
+    # gpg --export-ssh-key <key-id> to get the public key
+    gpg-agent --daemon --enable-ssh-support
+    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+    ########## gpg-agent end #########
+else
+    echo "Setup ssh-agent with ssh-agent because I cannot find the gpg key."
+    if [[ -f ~/.ssh/id_rsa ]]; then
+        eval $(ssh-agent -s) > /dev/null
+        ssh-add ~/.ssh/id_rsa
+    fi
 fi
 
 ########## ssh-agent end #########
-
-########## gpg-agent start #########
-
-# gpg --export-ssh-key <key-id> to get the public key
-gpg-agent --daemon --enable-ssh-support
-export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-
-########## gpg-agent end #########
 
 if which zenlog; then
     zenlog
