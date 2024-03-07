@@ -505,6 +505,10 @@ if [[ "$(gpg --list-secret-keys | grep 3FB4269CA58D57F0326C1F7488737135568C1AC5 
     # gpg --export-ssh-key <key-id> to get the public key
     gpg-agent --daemon --enable-ssh-support
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+    # https://wiki.archlinux.org/title/GnuPG#Configure_pinentry_to_use_the_correct_TTY
+    export GPG_TTY=$(tty)
+    gpg-connect-agent updatestartuptty /bye >/dev/null
     ########## gpg-agent end #########
 else
     echo "Setup ssh-agent with ssh-agent because I cannot find the gpg key."
