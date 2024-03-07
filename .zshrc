@@ -13,17 +13,18 @@ export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH=$HOME/.fzf/bin:$PATH
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-# export PATH="$PYENV_ROOT/bin:$PATH"
 
 export GOPATH="$HOME/.go"
 export PATH="$GOPATH/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
-eval "$(pyenv init -)"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
+
+eval "$(pyenv init -)"
+
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
