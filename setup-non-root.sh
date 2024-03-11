@@ -1,11 +1,12 @@
 #! /bin/bash -ex
 
-pip install --upgrade pip
-cd $HOME
+cd ${HOME}
 mkdir -p ${HOME}/.config
-ln -sf $HOME/public-tools/.tmux.conf
-ln -sf $HOME/public-tools/.zshrc
-ln -sf $HOME/public-tools/nvim $HOME/.config/nvim
+ln -sf ${HOME}/public-tools/.tmux.conf
+ln -sf ${HOME}/public-tools/.zshrc
+ln -sf ${HOME}/public-tools/nvim ${HOME}/.config/nvim
+ln -sf ${HOME}/public-tools/gnupg/gpg-agent.conf ${HOME}/.gnupg/gpg-agent.conf
+ln -sf ${HOME}/public-tools/gnupg/sshcontrol ${HOME}/.gnupg/sshcontrol
 touch .zenlog.toml
 
 if [ ! -d ${HOME}/.zplug ]
