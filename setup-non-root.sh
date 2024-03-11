@@ -27,3 +27,6 @@ pip3 install neovim flake8 ydiff msgpack --user
 # ========== Go package ===========
 cd $HOME
 go install github.com/x-motemen/ghq@latest
+
+# ========== git setting ===========
+git config --global core.editor $(which nvim)
