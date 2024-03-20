@@ -10,9 +10,14 @@ if [[ ! -d ${QEMU_PATH} ]]; then
   exit 1
 fi
 
+CAPSTONE_INSTALLED=$(apt list --installed | grep libcapstone-dev | wc -l)
+if [[ ${CAPSTONE_INSTALLED} -eq 0 ]]; then
+  echo Please run sudo apt install -y libcapstone-dev
+fi
+
 mkdir -p ${BUILD_PATH}
 cd ${BUILD_PATH}
-${QEMU_PATH}/configure --prefix=~/tmp/qemu-install --enable-debug
+${QEMU_PATH}/configure --prefix=~/tmp/qemu-install --enable-debug --enable-capstone
 bear -- make -j$(nproc)
 ln -sf ~/tmp/qemu-build/compile_commands.json ${QEMU_PATH}/compile_commands.json
 make install
