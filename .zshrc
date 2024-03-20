@@ -13,17 +13,18 @@ export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.gem/ruby/2.7.0/bin:$PATH
 export PATH=$HOME/.fzf/bin:$PATH
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-# export PATH="$PYENV_ROOT/bin:$PATH"
 
 export GOPATH="$HOME/.go"
 export PATH="$GOPATH/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
-eval "$(pyenv init -)"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
+
+eval "$(pyenv init -)"
+
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
@@ -500,9 +501,22 @@ export PATH=$(echo $PATH | sed -e "s|:/bin:|:|g"):/bin
 
 ########## ssh-agent start #########
 
-if [[ -f ~/.ssh/id_rsa ]]; then
-    eval $(ssh-agent -s) > /dev/null
-    ssh-add ~/.ssh/id_rsa
+if [[ "$(gpg --list-secret-keys | grep 3FB4269CA58D57F0326C1F7488737135568C1AC5 | wc -l)" == "1" ]]; then
+    echo "Setup ssh-agent with gpg-agent because I found the gpg key."
+    # gpg --export-ssh-key <key-id> to get the public key
+    gpg-agent --daemon --enable-ssh-support
+    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+    # https://wiki.archlinux.org/title/GnuPG#Configure_pinentry_to_use_the_correct_TTY
+    export GPG_TTY=$(tty)
+    gpg-connect-agent updatestartuptty /bye >/dev/null
+    ########## gpg-agent end #########
+else
+    echo "Setup ssh-agent with ssh-agent because I cannot find the gpg key."
+    if [[ -f ~/.ssh/id_rsa ]]; then
+        eval $(ssh-agent -s) > /dev/null
+        ssh-add ~/.ssh/id_rsa
+    fi
 fi
 
 ########## ssh-agent end #########
@@ -511,10 +525,3 @@ if which zenlog; then
     zenlog
 fi
 
-# Wasmer
-export WASMER_DIR="/home/akira/.wasmer"
-[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
-
-export WASMTIME_HOME="$HOME/.wasmtime"
-
-export PATH="$WASMTIME_HOME/bin:$PATH"
