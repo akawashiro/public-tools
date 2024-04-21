@@ -135,16 +135,16 @@ let g:fzf_colors = {
     \ 'spinner': ['fg', 'Label'],   
     \ 'header':  ['fg', 'Comment'] }
 
-command!      -bang -nargs=? -complete=dir TmuxFiles       call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p80%'}), <bang>0)',
-command!      -bang -nargs=? TmuxGitFiles                  call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p80%' } : {'tmux': '-p80%'}), <bang>0)',
-command!      -bang -nargs=? TmuxGFiles                    call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p80%' } : {'tmux': '-p80%'}), <bang>0)',
-command! -bar -bang -nargs=? -complete=buffer TmuxBuffers  call fzf#vim#buffers(<q-args>, fzf#vim#with_preview({ "placeholder": "{1}", 'tmux': '-p80%' }), <bang>0)',
-command!      -bang -nargs=* TmuxAg                        call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p80%'}), <bang>0)',
-command! -bang -nargs=* TmuxGCGrep call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 0, fzf#vim#with_preview({'options': ['--query', expand('<cword>')], 'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p80%'}), <bang>0)
+command!      -bang -nargs=? -complete=dir TmuxFiles       call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
+command!      -bang -nargs=? TmuxGitFiles                  call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p95%' } : {'tmux': '-p95%'}), <bang>0)',
+command!      -bang -nargs=? TmuxGFiles                    call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p95%' } : {'tmux': '-p95%'}), <bang>0)',
+command! -bar -bang -nargs=? -complete=buffer TmuxBuffers  call fzf#vim#buffers(<q-args>, fzf#vim#with_preview({ "placeholder": "{1}", 'tmux': '-p95%' }), <bang>0)',
+command!      -bang -nargs=* TmuxAg                        call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
+command! -bang -nargs=* TmuxGCGrep call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 0, fzf#vim#with_preview({'options': ['--query', expand('<cword>')], 'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p95%'}), <bang>0)
 command! -bang -nargs=* TmuxGGrep
   \ call fzf#vim#grep(
   \   'git grep --line-number -- '.shellescape(<q-args>), 0,
-  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0], 'options': '--delimiter : --nth 3..', 'tmux': '-p80%'}), <bang>0)
+  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0], 'options': '--delimiter : --nth 3..', 'tmux': '-p95%'}), <bang>0)
 
 noremap <Leader>ff :TmuxFiles<CR>
 noremap <Leader>fgf :TmuxGFiles<CR>
