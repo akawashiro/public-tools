@@ -42,6 +42,10 @@ export MANPAGER='nvim +Man!'
 # I don't use C-w
 stty werase undef
 
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_CONFIG_HOME=$HOME/.config
+export XDG_DATA_HOME=$HOME/.local/share
+
 ########## Environment variables end ##########
 
 ########## zplug start ##########
@@ -87,7 +91,6 @@ alias gd="git diff"
 alias gr="git remote -v"
 alias gcm="git commit -m"
 alias gwip="git add -u && git commit -m \"WIP\" && git push origin `git rev-parse --abbrev-ref HEAD`"
-alias gist="gh gist create --public"
 
 function glm(){
     git fetch --all
@@ -473,7 +476,11 @@ ZENLOG_RAW_VIEWER=google-chrome
 . <(zenlog basic-zsh-setup)
 
 zenlog_gh_gist_last_cmd() {
-    gh gist create --public $(realpath ${ZENLOG_DIR}/S)
+    if [[ ! -e ${HOME}/pfn-tools/make-akawashiro-gist.sh ]]; then
+        echo "Cannot find make-akawashiro-gist.sh"
+        return
+    fi
+    ${HOME}/pfn-tools/make-akawashiro-gist.sh $(realpath ${ZENLOG_DIR}/S)
 }
 
 zle -N zenlog_gh_gist_last_cmd
