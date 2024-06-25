@@ -354,12 +354,12 @@ fpath=(~/.zsh/completion $fpath)
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_TMUX=1
-export FZF_TMUX_OPTS="--reverse -p80%"
+export FZF_TMUX_OPTS="--reverse -p95%"
 
 function fzf-checkout-branch() {
   local branches branch
   branches=$(git branch --all | sed -e 's/\(^\* \|^  \)//g' | cut -d " " -f 1)
-  branch=$(echo "$branches" | fzf-tmux -p 80% --reverse --preview "git show --color=always {}")
+  branch=$(echo "$branches" | fzf-tmux -p 95% --reverse --preview "git show --color=always {}")
 
   local_branch=$(echo "$branch" | sed -e "s:^remotes/::")
   create_origin_branch=$(echo "$branch" | sed -e "s:^remotes/origin/::")
@@ -378,7 +378,7 @@ zle     -N   fzf-checkout-branch
 bindkey "^v" fzf-checkout-branch
 
 fzf-z-search() {
-    local res=$(z | sort -rn | cut -c 12- | fzf-tmux -p 80% --reverse)
+    local res=$(z | sort -rn | cut -c 12- | fzf-tmux -p 95% --reverse)
     if [ -n "$res" ]; then
         BUFFER+="cd $res"
         zle accept-line
@@ -391,7 +391,7 @@ zle -N fzf-z-search
 bindkey '^z' fzf-z-search
 
 fzf-f-locate() {
-    local res=$(find / 2>/dev/null | fzf-tmux -p 80% --reverse)
+    local res=$(find / 2>/dev/null | fzf-tmux -p 95% --reverse)
     if [ -n "$res" ]; then
         BUFFER+="$res"
     else
@@ -403,7 +403,7 @@ zle -N fzf-f-locate
 bindkey '^f' fzf-f-locate
 
 function ghq-fzf() {
-  local src=$(ghq list | fzf-tmux -p 80% --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
+  local src=$(ghq list | fzf-tmux -p 95% --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
   if [ -n "$src" ]; then
     BUFFER="cd $(ghq root)/$src"
     zle accept-line
@@ -414,7 +414,7 @@ zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
 function ghsearch-fzf() {
-  ghsearch emit | fzf-tmux -p 80% --reverse --preview 'ghsearch preview {} {q}' --preview-window=,~2 | xargs -I{} ghsearch open {}
+  ghsearch emit | fzf-tmux -p 95% --reverse --preview 'ghsearch preview {} {q}' --preview-window=,~2 | xargs -I{} ghsearch open {}
 }
 zle -N ghsearch-fzf
 bindkey '^g' ghsearch-fzf

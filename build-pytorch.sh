@@ -22,6 +22,6 @@ cmake -S ${SOURCE_DIR} -B ${BUILD_DIR} -G Ninja \
     -DUSE_ROCM=OFF \
     -DUSE_NCCL=OFF \
     -DUSE_NNPACK=OFF \
-    -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR}
 cmake --build ${BUILD_DIR} -- -j12 install
