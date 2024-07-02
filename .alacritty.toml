@@ -43,3 +43,7 @@ blue    = '#367bf0'
 magenta = '#BF2E5D'
 cyan    = '#49AEE6'
 white   = '#FFFFFF'
+
+[window]
+dimensions.columns = 80
+dimensions.lines = 24
