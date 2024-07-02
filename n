@@ -1,7 +1,0 @@
-#!/bin/sh
-
-if [ -e build/build.ninja ]; then
-    cd build
-fi
-
-exec ninja "$@"

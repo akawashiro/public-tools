@@ -1,8 +1,0 @@
-#! /bin/bash
-
-branch=`git rev-parse --abbrev-ref HEAD`
-git fetch --all
-git checkout master
-git merge upstream/master
-git checkout ${branch}
-git rebase master
