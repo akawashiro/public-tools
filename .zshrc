@@ -69,8 +69,8 @@ zplug load --verbose
 ########## tmux start ##########
 
 function tnew(){
-    local c=$(pwd)
-    local d=$(basename "${c}" | tr . _)
+    local current_dir=$(pwd)
+    local d=$(basename "${current_dir}" | tr . _)
     tmux new -s ${d}
 }
 
