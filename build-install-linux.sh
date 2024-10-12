@@ -19,6 +19,7 @@ REBOOT_AFTER_INSTALL=${REBOOT_AFTER_INSTALL:-no}
 CONFIG_PATH=${CONFIG_PATH:-/boot/config-$(uname -r)}
 LINUX_DIR=${LINUX_DIR:-$(ghq root)/github.com/akawashiro/linux}
 BUILD_DIR=${BUILD_DIR:-${HOME}/tmp/linux-build}
+LOCALVERSION=-built-by-$(whoami)-${BRANCH_NAME}
 
 # Check inputs
 if [[ "${INSTALL_PACKAGES}" != yes ]] && [[ "${INSTALL_PACKAGES}" != no ]]
@@ -42,7 +43,25 @@ fi
 if [[ "${INSTALL_PACKAGES}" == yes ]]
 then
     sudo apt-get -y build-dep linux
-    sudo apt-get -y install libncurses-dev gawk flex bison openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev libiberty-dev autoconf git ccache dwarves cmake bear
+    sudo apt-get -y install \
+        libncurses-dev \
+        gawk \
+        flex \
+        bison \
+        openssl \
+        libssl-dev \
+        dkms \
+        libelf-dev \
+        libudev-dev \
+        libpci-dev \
+        libiberty-dev \
+        autoconf \
+        git \
+        ccache \
+        dwarves \
+        cmake \
+        bear \
+        clang
 fi
 
 # Sometimes you must delete all obsoluted kernels before install new one.
@@ -94,9 +113,9 @@ popd
 
 # Build Linux kernel
 pushd "${LINUX_DIR}"
-bear -- make defconfig LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache clang" O="${BUILD_DIR}"
-bear -- make kvm_guest.config LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache clang" O="${BUILD_DIR}"
-bear -- make LOCALVERSION=-dev-${BRANCH_NAME} CC="ccache clang" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
+bear -- make defconfig LOCALVERSION=${LOCALVERSION} CC="ccache clang" O="${BUILD_DIR}"
+bear -- make kvm_guest.config LOCALVERSION=${LOCALVERSION} CC="ccache clang" O="${BUILD_DIR}"
+bear -- make LOCALVERSION=${LOCALVERSION} CC="ccache clang" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
 
 # Install Linux kernel
 if [[ "${INSTALL_BUILT_KERNEL}" == yes ]]
