@@ -21,8 +21,7 @@ fi
 
 # ========== python3 package ==========
 cd $HOME
-pip3 install --upgrade pip --user
-pip3 install neovim flake8 ydiff msgpack --user
+pip3 install neovim flake8 ydiff msgpack --user --break-system-packages
 
 # ========== Go package ===========
 cd $HOME
