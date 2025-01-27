@@ -4,6 +4,13 @@ SOURCE_DIR=$(ghq list -p | grep pytorch | head -n 1)
 
 BUILD_DIR=${HOME}/tmp/pytorch-build
 INSTALL_DIR=${HOME}/tmp/pytorch-install
+VENV_DIR=${HOME}/tmp/pytorch-venv
+
+rm -rf ${VENV_DIR}
+python3 -m venv ${VENV_DIR}
+source ${VENV_DIR}/bin/activate
+pip3 install -r ${SOURCE_DIR}/requirements.txt
+
 mkdir -p ${BUILD_DIR}
 mkdir -p ${INSTALL_DIR}
 
