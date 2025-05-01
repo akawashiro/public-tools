@@ -113,9 +113,10 @@ popd
 
 # Build Linux kernel
 pushd "${LINUX_DIR}"
-bear -- make defconfig LOCALVERSION=${LOCALVERSION} CC="ccache clang" O="${BUILD_DIR}"
-bear -- make kvm_guest.config LOCALVERSION=${LOCALVERSION} CC="ccache clang" O="${BUILD_DIR}"
-bear -- make LOCALVERSION=${LOCALVERSION} CC="ccache clang" -j ${USE_CPUS} O="${BUILD_DIR}" 2>&1 | tee "${BUILD_DIR}"/build-$(date +%s).log
+make defconfig LOCALVERSION=${LOCALVERSION} CC="ccache clang" O="${BUILD_DIR}"
+make kvm_guest.config LOCALVERSION=${LOCALVERSION} CC="ccache clang" O="${BUILD_DIR}"
+make LOCALVERSION=${LOCALVERSION} CC="ccache clang" -j ${USE_CPUS} O="${BUILD_DIR}"
+./scripts/clang-tools/gen_compile_commands.py --directory "${BUILD_DIR}"
 
 # Install Linux kernel
 if [[ "${INSTALL_BUILT_KERNEL}" == yes ]]
