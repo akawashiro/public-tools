@@ -93,18 +93,24 @@ alias gcm="git commit -m"
 alias gwip="git add -u && git commit -m \"WIP\" && git push origin `git rev-parse --abbrev-ref HEAD`"
 
 function glm(){
-    git fetch --all
     local is_master=$(git branch | grep master)
     local is_main=$(git branch | grep main)
+    local master_or_main=""
     if [ ! -z "${is_master}" ]; then
-        git checkout master
-        git merge upstream/master
+        master_or_main=master
     elif [ ! -z "${is_main}" ]; then
-        git checkout main
-        git merge upstream/main
+        master_or_main=main
     else
         echo "Cannot find master or main branch."
+        return
     fi
+
+    local backup_branch=${master_or_main}-backup-$(date "+%Y%m%d%M%S")
+    git checkout ${master_or_main}
+    git switch --create ${backup_branch}
+    git branch -D ${master_or_main}
+    git fetch upstream ${master_or_main}
+    git switch --create ${master_or_main} upstream/${master_or_main}
 }
 
 function grm(){
