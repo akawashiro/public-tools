@@ -29,3 +29,14 @@ go install github.com/x-motemen/ghq@latest
 
 # ========== git setting ===========
 git config --global core.editor $(which nvim)
+
+
+# ========== Powerline fonts ==========
+TMPDIR=$(mktemp -d)
+pushd ${TMPDIR}
+git clone https://github.com/powerline/fonts.git --depth=1
+cd fonts
+./install.sh
+cd ..
+popd
+rm -rf ${TMPDIR}
