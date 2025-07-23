@@ -1,8 +1,5 @@
 #! /bin/bash -ux
 
-export GOPATH="$HOME/.go"
-export PATH="$GOPATH/.bin:$PATH"
-
 ghq get git@github.com:akawashiro/misc.git
 
 ghq get git@github.com:akawashiro/sold.git
@@ -28,6 +25,8 @@ ghq get https://github.com/awslabs/mountpoint-s3.git
 ghq get https://github.com/python/cpython.git
 
 ghq get https://github.com/facebookresearch/llama.git
+
+ghq get git@github.com:akawashiro/ELF2.jl.git
 
 ghq get git@github.com:akawashiro/tensorflow.git
 cd $(ghq root)/github.com/akawashiro/tensorflow
@@ -61,3 +60,18 @@ git remote add upstream git@github.com:ruby/ruby.git
 git remote set-url upstream --push no-push
 
 ghq get https://github.com/llvm/llvm-project.git
+
+ghq get git@github.com:akawashiro/qemu.git
+cd $(ghq root)/github.com/akawashiro/qemu
+git remote add upstream https://github.com/qemu/qemu
+git remote set-url --push upstream no_push
+
+ghq get git@github.com:akawashiro/julia.git
+cd $(ghq root)/github.com/akawashiro/julia
+git remote add upstream git@github.com:JuliaLang/julia.git
+git remote set-url upstream --push no-push
+
+ghq get git@github.com:akawashiro/optuna.git
+cd $(ghq root)/github.com/akawashiro/optuna
+git remote add upstream git@github.com:optuna/optuna.git
+git remote set-url upstream --push no-push
