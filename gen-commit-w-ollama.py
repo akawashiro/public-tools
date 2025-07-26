@@ -86,7 +86,9 @@ def generate_commit_message(
         sys.exit(1)
 
 
-def extract_commit_message(response_data: Dict[str, Any], model_name: str) -> Optional[str]:
+def extract_commit_message(
+    response_data: Dict[str, Any], model_name: str
+) -> Optional[str]:
     """Extract commit message from Ollama response, removing <think> tags for qwen3:8b."""
     try:
         response_text = response_data.get("response", "")
@@ -95,7 +97,9 @@ def extract_commit_message(response_data: Dict[str, Any], model_name: str) -> Op
             return None
 
         if model_name == "qwen3:8b":
-            cleaned_text = re.sub(r"<think>.*?</think>", "", response_text, flags=re.DOTALL)
+            cleaned_text = re.sub(
+                r"<think>.*?</think>", "", response_text, flags=re.DOTALL
+            )
         else:
             cleaned_text = response_text
 
@@ -116,10 +120,7 @@ def execute_git_commit(commit_message: str) -> None:
     """Execute git commit with the generated message."""
     try:
         logger.info("Executing git commit with generated message")
-        subprocess.run(
-            ["git", "commit", "-m", commit_message, "-e"],
-            check=True
-        )
+        subprocess.run(["git", "commit", "-m", commit_message, "-e"], check=True)
         logger.info("Successfully committed changes")
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to commit changes: {e}")
