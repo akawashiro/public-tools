@@ -1,0 +1,8 @@
+[Unit]
+Description=Run ollama locally
+
+[Service]
+ExecStart=/home/akira/public-tools/run_ollama_container_service.sh
+
+[Install]
+WantedBy=default.target
