@@ -10,6 +10,7 @@ docker run \
     --name ${ollama_container_name} \
     --rm \
     --detach \
+    --gpus=all \
     -v ${ollama_dir}:/root/.ollama \
     ollama/ollama
 sleep 2
