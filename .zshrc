@@ -482,11 +482,11 @@ ZENLOG_RAW_VIEWER=google-chrome
 . <(zenlog basic-zsh-setup)
 
 zenlog_gh_gist_last_cmd() {
-    if [[ ! -e ${HOME}/pfn-tools/make-akawashiro-gist.sh ]]; then
+    if [[ ! -e ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh ]]; then
         echo "Cannot find make-akawashiro-gist.sh"
         return
     fi
-    ${HOME}/pfn-tools/make-akawashiro-gist.sh $(realpath ${ZENLOG_DIR}/S)
+    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${ZENLOG_DIR}/S)
 }
 
 zle -N zenlog_gh_gist_last_cmd
