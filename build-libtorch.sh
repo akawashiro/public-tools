@@ -1,8 +1,8 @@
 #! /bin/bash -eux
 
 SOURCE_DIR=$(ghq list -p | grep pytorch | head -n 1)
-BUILD_DIR=${HOME}/tmp/pytorch-build
-INSTALL_DIR=${HOME}/tmp/pytorch-install
+BUILD_DIR=${HOME}/tmp/libtorch-build
+INSTALL_DIR=${HOME}/tmp/libtorch-install
 mkdir -p ${BUILD_DIR}
 mkdir -p ${INSTALL_DIR}
 
@@ -22,4 +22,4 @@ cmake -S ${SOURCE_DIR} -B ${BUILD_DIR} -G Ninja \
     -DUSE_NNPACK=OFF \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR}
-cmake --build ${BUILD_DIR} -- -j12 install
+cmake --build ${BUILD_DIR} -- -j install

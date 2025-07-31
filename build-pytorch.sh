@@ -1,7 +1,6 @@
 #! /bin/bash -eux
 
 SOURCE_DIR=$(ghq list -p | grep pytorch | head -n 1)
-
 BUILD_DIR=${HOME}/tmp/pytorch-build
 INSTALL_DIR=${HOME}/tmp/pytorch-install
 VENV_DIR=${HOME}/tmp/pytorch-venv
