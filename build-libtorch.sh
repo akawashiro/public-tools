@@ -3,6 +3,13 @@
 SOURCE_DIR=$(ghq list -p | grep pytorch | head -n 1)
 BUILD_DIR=${HOME}/tmp/libtorch-build
 INSTALL_DIR=${HOME}/tmp/libtorch-install
+VENV_DIR=${HOME}/tmp/libtorch-venv
+
+rm -rf ${VENV_DIR}
+python3 -m venv ${VENV_DIR}
+source ${VENV_DIR}/bin/activate
+pip3 install -r ${SOURCE_DIR}/requirements.txt
+
 mkdir -p ${BUILD_DIR}
 mkdir -p ${INSTALL_DIR}
 
@@ -22,4 +29,4 @@ cmake -S ${SOURCE_DIR} -B ${BUILD_DIR} -G Ninja \
     -DUSE_NNPACK=OFF \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR}
-cmake --build ${BUILD_DIR} -- -j install
+cmake --build ${BUILD_DIR} -- install
