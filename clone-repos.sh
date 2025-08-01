@@ -75,3 +75,10 @@ ghq get git@github.com:akawashiro/optuna.git
 cd $(ghq root)/github.com/akawashiro/optuna
 git remote add upstream git@github.com:optuna/optuna.git
 git remote set-url upstream --push no-push
+
+ghq get git@github.com:akawashiro/lmbench.git
+cd $(ghq root)/github.com/akawashiro/lmbench
+git remote add upstream https://github.com/intel/lmbench.git
+git remote set-url upstream --push no-push
+
+ghq get git@github.com:akawashiro/akbench.git
