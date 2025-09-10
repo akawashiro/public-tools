@@ -31,7 +31,6 @@ go install github.com/x-motemen/ghq@latest
 # ========== git setting ===========
 git config --global core.editor $(which nvim)
 
-
 # ========== Powerline fonts ==========
 TMPDIR=$(mktemp -d)
 pushd ${TMPDIR}
