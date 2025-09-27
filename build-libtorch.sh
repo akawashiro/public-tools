@@ -22,11 +22,13 @@ cmake -S ${SOURCE_DIR} -B ${BUILD_DIR} -G Ninja \
     -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
     -DPYTHON_EXECUTABLE:PATH=`which python3` \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DUSE_CUDA=OFF \
-    -DUSE_CUDNN=OFF \
+    -DUSE_CUDA=ON \
+    -DUSE_CUDNN=ON \
     -DUSE_ROCM=OFF \
     -DUSE_NCCL=OFF \
     -DUSE_NNPACK=OFF \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
+    -DCMAKE_CUDA_COMPILER_LAUNCHER=ccache \
     -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR}
 cmake --build ${BUILD_DIR} -- install
