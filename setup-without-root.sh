@@ -10,11 +10,6 @@ ln -sf ${HOME}/public-tools/gnupg/gpg-agent.conf ${HOME}/.gnupg/gpg-agent.conf
 ln -sf ${HOME}/public-tools/gnupg/sshcontrol ${HOME}/.gnupg/sshcontrol
 touch .zenlog.toml
 
-if [ ! -d ${HOME}/.zplug ]
-then
-    curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
-fi
-
 if [ ! -d ${HOME}/.tmux/plugins/tpm ]
 then
     git clone https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
