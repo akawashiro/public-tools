@@ -502,10 +502,12 @@ if [[ "$(gpg --list-secret-keys | grep 3FB4269CA58D57F0326C1F7488737135568C1AC5 
     gpg-agent --daemon --enable-ssh-support
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 else
-    echo "Setup ssh-agent with ssh-agent because I cannot find the gpg key."
+    echo "Trying to setup ssh-agent with ssh-agent because I cannot find the gpg key."
     if [[ -f ~/.ssh/id_rsa ]]; then
         eval $(ssh-agent -s) > /dev/null
         ssh-add ~/.ssh/id_rsa
+    else
+        echo "No ~/.ssh/id_rsa found. Not starting ssh-agent."
     fi
 fi
 
