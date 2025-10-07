@@ -509,6 +509,8 @@ else
         echo "Setup ssh-agent with ~/.ssh/id_rsa because I cannot find the gpg key."
         eval $(ssh-agent -s) > /dev/null
         ssh-add ~/.ssh/id_rsa
+    else
+        echo "No ~/.ssh/id_rsa found. Failed to start ssh-agent."
     fi
 fi
 
