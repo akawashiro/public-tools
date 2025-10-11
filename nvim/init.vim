@@ -57,7 +57,7 @@ set cindent
 syntax on
 
 colorscheme desert
-# Use Inspect command to check which group to override
+" Use Inspect command to check which group to override
 highlight CocUnusedHighlight guifg=Red gui=bold
 
 set spell
