@@ -542,7 +542,7 @@ fi
 
 ########## renlog start #########
 
-if which renlog > /dev/null 2>&1 && [[ "${TMUX}" ]]; then
+if which renlog > /dev/null 2>&1; then
     if [[ -z "${RENLOG_PID}" ]]; then
         renlog_dir=$(mktemp -d /tmp/renlog.XXXXXX)
         exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
