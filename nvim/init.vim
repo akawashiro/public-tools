@@ -29,7 +29,6 @@ Plug 'jistr/vim-nerdtree-tabs'
 Plug 'preservim/tagbar'
 Plug 'airblade/vim-gitgutter'
 Plug 'cespare/vim-toml'
-Plug 'tyru/caw.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'vim-airline/vim-airline'
