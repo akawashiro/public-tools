@@ -29,6 +29,7 @@ repos=(
   "git@github.com:akawashiro/optuna.git"
   "git@github.com:akawashiro/lmbench.git"
   "git@github.com:akawashiro/akbench.git"
+  "git@github.com:akawashiro/renlog.git"
 )
 
 repo_match() {
