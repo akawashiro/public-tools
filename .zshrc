@@ -542,14 +542,22 @@ fi
 
 ########## renlog start #########
 
-if which renlog > /dev/null 2>&1; then
-    if [[ -z "${RENLOG_PID}" && -n "${TMUX}" ]]; then
-        renlog_dir=$(mktemp -d /tmp/renlog.XXXXXX)
-        exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
-    else
-        # We're already inside renlog, just load the shell integration
-        eval "$(renlog show-zsh-rc)"
-    fi
+if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
+    renlog_dir=$(mktemp -d /tmp/renlog.XXXXXX)
+    exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
+else
+    eval "$(renlog show-zsh-rc)"
 fi
+
+# if which renlog > /dev/null 2>&1; then
+# 
+#     if [[ -z "${RENLOG_PID}" && -n "${TMUX}" ]]; then
+#         renlog_dir=$(mktemp -d /tmp/renlog.XXXXXX)
+#         exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
+#     else
+#         # We're already inside renlog, just load the shell integration
+#         eval "$(renlog show-zsh-rc)"
+#     fi
+# fi
 
 ########## renlog end #########
