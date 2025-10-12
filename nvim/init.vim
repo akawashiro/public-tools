@@ -36,6 +36,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'vim-scripts/a.vim', { 'for': ['c', 'cpp'] }
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'github/copilot.vim'
+Plug 'tyru/caw.vim'
 
 call plug#end()
 
