@@ -468,12 +468,17 @@ if [[ "$(gpg --list-secret-keys | grep 3FB4269CA58D57F0326C1F7488737135568C1AC5 
     gpg-agent --daemon --enable-ssh-support
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 else
+    echo "Try setting up ssh-agent with ssh identification file because I cannot find the gpg key."
     if [[ -f ~/.ssh/id_rsa ]]; then
-        echo "Setup ssh-agent with ~/.ssh/id_rsa because I cannot find the gpg key."
+        echo "Setup ssh-agent with ~/.ssh/id_rsa."
         eval $(ssh-agent -s) > /dev/null
         ssh-add ~/.ssh/id_rsa
+    elif [[ -f ~/.ssh/id_ed25519 ]]; then
+        echo "Setup ssh-agent with ~/.ssh/id_ed25519."
+        eval $(ssh-agent -s) > /dev/null
+        ssh-add ~/.ssh/id_ed25519
     else
-        echo "No ~/.ssh/id_rsa found. Failed to start ssh-agent."
+        echo "No ssh identification file found. Failed to start ssh-agent."
     fi
 fi
 
@@ -550,16 +555,5 @@ if which renlog > /dev/null 2>&1; then
         eval "$(renlog show-zsh-rc)"
     fi
 fi
-
-# if which renlog > /dev/null 2>&1; then
-# 
-#     if [[ -z "${RENLOG_PID}" && -n "${TMUX}" ]]; then
-#         renlog_dir=$(mktemp -d /tmp/renlog.XXXXXX)
-#         exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
-#     else
-#         # We're already inside renlog, just load the shell integration
-#         eval "$(renlog show-zsh-rc)"
-#     fi
-# fi
 
 ########## renlog end #########
