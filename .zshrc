@@ -22,7 +22,10 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '$HOME/google-cloud-sdk/path.zsh.inc' ]; then . '$HOME/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
+    echo "Found google-cloud-sdk."
+    source "${HOME}/google-cloud-sdk/path.zsh.inc"
+fi
 
 export NVM_DIR="$HOME/.nvm"
 
