@@ -559,4 +559,16 @@ if which renlog > /dev/null 2>&1; then
     fi
 fi
 
+renlog_view_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LOG_FILE})
+    if [ -f "${last_log_file}" ]; then
+        nvim "${last_log_file}"
+    else
+        echo "No log file found."
+    fi
+}
+
+zle -N renlog_view_last_cmd
+bindkey '^[1' renlog_view_last_cmd
+
 ########## renlog end #########
