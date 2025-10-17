@@ -6,7 +6,6 @@ export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.local/sbin:$PATH
-export PATH=$HOME/pfn-tools:$PATH
 export PATH=$HOME/public-tools:$PATH
 export PATH=$HOME/tools:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
@@ -570,5 +569,17 @@ renlog_view_last_cmd() {
 
 zle -N renlog_view_last_cmd
 bindkey '^[1' renlog_view_last_cmd
+
+renlog_gist_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
+    if [[ ! -e ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh ]]; then
+        echo "Cannot find make-akawashiro-gist.sh"
+        return
+    fi
+    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${last_log_file})
+}
+
+zle -N renlog_gist_last_cmd
+bindkey '^[2' renlog_gist_last_cmd
 
 ########## renlog end #########
