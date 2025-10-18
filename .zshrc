@@ -53,6 +53,45 @@ export XDG_DATA_HOME=$HOME/.local/share
 
 ########## Environment variables end ##########
 
+########## renlog start #########
+# Because renlog launch a new shell, we want to put renlog settings as early as
+# possible to shorten the startup time.
+
+if which renlog > /dev/null 2>&1; then
+    if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
+        renlog_dir=/tmp/renlog
+        exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
+    else
+        eval "$(renlog show-zsh-rc)"
+    fi
+fi
+
+renlog_view_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
+    if [ -f "${last_log_file}" ]; then
+        nvim "${last_log_file}"
+    else
+        echo "No log file found."
+    fi
+}
+
+zle -N renlog_view_last_cmd
+bindkey '^[1' renlog_view_last_cmd
+
+renlog_gist_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
+    if [[ ! -e ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh ]]; then
+        echo "Cannot find make-akawashiro-gist.sh"
+        return
+    fi
+    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${last_log_file})
+}
+
+zle -N renlog_gist_last_cmd
+bindkey '^[2' renlog_gist_last_cmd
+
+########## renlog end #########
+
 ########## tmux start ##########
 
 function tnew(){
@@ -465,40 +504,3 @@ else
 fi
 
 ########## ssh-agent and tmux end #########
-
-########## renlog start #########
-
-if which renlog > /dev/null 2>&1; then
-    if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
-        renlog_dir=/tmp/renlog
-        exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
-    else
-        eval "$(renlog show-zsh-rc)"
-    fi
-fi
-
-renlog_view_last_cmd() {
-    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
-    if [ -f "${last_log_file}" ]; then
-        nvim "${last_log_file}"
-    else
-        echo "No log file found."
-    fi
-}
-
-zle -N renlog_view_last_cmd
-bindkey '^[1' renlog_view_last_cmd
-
-renlog_gist_last_cmd() {
-    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
-    if [[ ! -e ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh ]]; then
-        echo "Cannot find make-akawashiro-gist.sh"
-        return
-    fi
-    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${last_log_file})
-}
-
-zle -N renlog_gist_last_cmd
-bindkey '^[2' renlog_gist_last_cmd
-
-########## renlog end #########
