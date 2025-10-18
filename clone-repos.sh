@@ -30,6 +30,8 @@ repos=(
   "git@github.com:akawashiro/lmbench.git"
   "git@github.com:akawashiro/akbench.git"
   "git@github.com:akawashiro/renlog.git"
+  "https://github.com/huggingface/transformers.git"
+  "git@github.com:akawashiro/nano-vllm.git"
 )
 
 repo_match() {
@@ -92,6 +94,11 @@ for repo in "${repos[@]}"; do
       lmbench)
         cd "$(ghq root)/github.com/akawashiro/lmbench"
         git remote add upstream https://github.com/intel/lmbench.git || true
+        git remote set-url upstream --push no-push
+        ;;
+      nano-vllm)
+        cd "$(ghq root)/github.com/akawashiro/nano-vllm"
+        git remote add upstream https://github.com/GeeeekExplorer/nano-vllm.git || true
         git remote set-url upstream --push no-push
         ;;
     esac

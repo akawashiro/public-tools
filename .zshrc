@@ -6,7 +6,6 @@ export PATH=/var/lib/snapd/snap/bin:$PATH
 export PATH=$HOME/.cabal/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.local/sbin:$PATH
-export PATH=$HOME/pfn-tools:$PATH
 export PATH=$HOME/public-tools:$PATH
 export PATH=$HOME/tools:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
@@ -22,7 +21,10 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '$HOME/google-cloud-sdk/path.zsh.inc' ]; then . '$HOME/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
+    echo "Found google-cloud-sdk."
+    source "${HOME}/google-cloud-sdk/path.zsh.inc"
+fi
 
 export NVM_DIR="$HOME/.nvm"
 
@@ -191,12 +193,6 @@ select-word-style default
 zstyle ':zle:*' word-chars " /=;@:{},|"
 zstyle ':zle:*' word-style unspecified
 
-########################################
-# 補完
-# 補完機能を有効にする
-# autoload -Uz compinit
-# compinit -u
-
 # 補完で小文字でも大文字にマッチさせる
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
@@ -245,16 +241,6 @@ setopt hist_ignore_space
 
 # ヒストリに保存するときに余分なスペースを削除する
 setopt hist_reduce_blanks
-
-# 高機能なワイルドカード展開を使用する
-setopt extended_glob
-
-# キーバインド
-
-# ^R で履歴検索をするときに * でワイルドカードを使用出来るようにする
-bindkey '^R' history-incremental-pattern-search-backward
-
-# vim:set ft=zsh:
 
 ########## zsh miscellaneous end ###########
 
@@ -315,30 +301,6 @@ case ${OSTYPE} in
 esac
 
 ########### OS specific settings end ##########
-
-########### Haskell start ##########
-
-function haskell-purify-force(){
-    if [ $# -ne 1 ]; then
-        echo "You need to give a haskell source code."
-    else
-        hlint --refactor --refactor-options='-i' $1
-        hlint --refactor --refactor-options='-i' $1
-        hlint --refactor --refactor-options='-i' $1
-        stylish-haskell --inplace $1
-    fi
-}
-
-########### Haskell end ##########
-
-########### OCaml start ##########
-
-alias ocaml='ledit ocaml'
-. $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-
-fpath=(~/.zsh/completion $fpath)
-
-########### OCaml end ##########
 
 ########## fzf start ########## 
 # C-v checkout branch
@@ -468,12 +430,17 @@ if [[ "$(gpg --list-secret-keys | grep 3FB4269CA58D57F0326C1F7488737135568C1AC5 
     gpg-agent --daemon --enable-ssh-support
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 else
+    echo "Try setting up ssh-agent with ssh identification file because I cannot find the gpg key."
     if [[ -f ~/.ssh/id_rsa ]]; then
-        echo "Setup ssh-agent with ~/.ssh/id_rsa because I cannot find the gpg key."
+        echo "Setup ssh-agent with ~/.ssh/id_rsa."
         eval $(ssh-agent -s) > /dev/null
         ssh-add ~/.ssh/id_rsa
+    elif [[ -f ~/.ssh/id_ed25519 ]]; then
+        echo "Setup ssh-agent with ~/.ssh/id_ed25519."
+        eval $(ssh-agent -s) > /dev/null
+        ssh-add ~/.ssh/id_ed25519
     else
-        echo "No ~/.ssh/id_rsa found. Failed to start ssh-agent."
+        echo "No ssh identification file found. Failed to start ssh-agent."
     fi
 fi
 
@@ -499,43 +466,39 @@ fi
 
 ########## ssh-agent and tmux end #########
 
-########## zenlog start ##########
+########## renlog start #########
 
-export ZENLOG_SRC_DIR=$HOME/src/zenlog/
-export ZENLOG_DIR=/tmp/zenlog-dir/
+if which renlog > /dev/null 2>&1; then
+    if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
+        renlog_dir=$(mktemp -d /tmp/renlog.XXXXXX)
+        exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
+    else
+        eval "$(renlog show-zsh-rc)"
+    fi
+fi
 
-# Set up zenlog.
-# Note the following command does *not* start a zenlog session.
-# Type "zenlog" manually to start one, or change your terminal app's setting
-# to start zenlog instead of your login shell.
-#
-# Uncomment the following line to suppress zenlog default prompt.
-# ZENLOG_NO_DEFAULT_PROMPT=1
-#
-# Uncomment the following line to suppress zenlog default key bindings.
-# ZENLOG_NO_DEFAULT_BINDING=1
+renlog_view_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
+    if [ -f "${last_log_file}" ]; then
+        nvim "${last_log_file}"
+    else
+        echo "No log file found."
+    fi
+}
 
-# Open log files in this command.
-ZENLOG_VIEWER=nvim
+zle -N renlog_view_last_cmd
+bindkey '^[1' renlog_view_last_cmd
 
-# Open raw log in this command. (Requires A2H.)
-ZENLOG_RAW_VIEWER=google-chrome
-
-. <(zenlog basic-zsh-setup)
-
-zenlog_gh_gist_last_cmd() {
+renlog_gist_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
     if [[ ! -e ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh ]]; then
         echo "Cannot find make-akawashiro-gist.sh"
         return
     fi
-    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${ZENLOG_DIR}/S)
+    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${last_log_file})
 }
 
-zle -N zenlog_gh_gist_last_cmd
-bindkey '^[5' zenlog_gh_gist_last_cmd
+zle -N renlog_gist_last_cmd
+bindkey '^[2' renlog_gist_last_cmd
 
-if which zenlog; then
-    zenlog
-fi
-
-########## zenlog end ##########
+########## renlog end #########
