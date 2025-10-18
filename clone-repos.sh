@@ -32,6 +32,7 @@ repos=(
   "git@github.com:akawashiro/renlog.git"
   "https://github.com/huggingface/transformers.git"
   "git@github.com:akawashiro/nano-vllm.git"
+  "git@github.com:akawashiro/akawashiro.com.git"
 )
 
 repo_match() {
