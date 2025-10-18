@@ -470,7 +470,7 @@ fi
 
 if which renlog > /dev/null 2>&1; then
     if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
-        renlog_dir=$(mktemp -d /tmp/renlog.XXXXXX)
+        renlog_dir=/tmp/renlog
         exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
     else
         eval "$(renlog show-zsh-rc)"
