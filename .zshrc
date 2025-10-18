@@ -193,12 +193,6 @@ select-word-style default
 zstyle ':zle:*' word-chars " /=;@:{},|"
 zstyle ':zle:*' word-style unspecified
 
-########################################
-# 補完
-# 補完機能を有効にする
-# autoload -Uz compinit
-# compinit -u
-
 # 補完で小文字でも大文字にマッチさせる
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
@@ -247,16 +241,6 @@ setopt hist_ignore_space
 
 # ヒストリに保存するときに余分なスペースを削除する
 setopt hist_reduce_blanks
-
-# 高機能なワイルドカード展開を使用する
-setopt extended_glob
-
-# キーバインド
-
-# ^R で履歴検索をするときに * でワイルドカードを使用出来るようにする
-bindkey '^R' history-incremental-pattern-search-backward
-
-# vim:set ft=zsh:
 
 ########## zsh miscellaneous end ###########
 
@@ -317,30 +301,6 @@ case ${OSTYPE} in
 esac
 
 ########### OS specific settings end ##########
-
-########### Haskell start ##########
-
-function haskell-purify-force(){
-    if [ $# -ne 1 ]; then
-        echo "You need to give a haskell source code."
-    else
-        hlint --refactor --refactor-options='-i' $1
-        hlint --refactor --refactor-options='-i' $1
-        hlint --refactor --refactor-options='-i' $1
-        stylish-haskell --inplace $1
-    fi
-}
-
-########### Haskell end ##########
-
-########### OCaml start ##########
-
-alias ocaml='ledit ocaml'
-. $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-
-fpath=(~/.zsh/completion $fpath)
-
-########### OCaml end ##########
 
 ########## fzf start ########## 
 # C-v checkout branch
