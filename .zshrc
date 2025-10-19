@@ -395,6 +395,18 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
+function renlog-fzf() {
+  local renlog_log_files=$(find /tmp/renlog -type f -name "*.log" 2>/dev/null)
+  local src=$(echo ${renlog_log_files} | fzf-tmux -p 95% --preview "cat {}")
+  if [ -n "$src" ]; then
+    BUFFER="nvim $src"
+    zle accept-line
+  fi
+  zle -R -c
+}
+zle -N renlog-fzf
+bindkey '^e' renlog-fzf
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
