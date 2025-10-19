@@ -138,7 +138,6 @@ let g:fzf_colors = {
     \ 'header':  ['fg', 'Comment'] }
 
 command!      -bang -nargs=? -complete=dir TmuxFiles       call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
-command!      -bang -nargs=? TmuxGitFiles                  call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p95%' } : {'tmux': '-p95%'}), <bang>0)',
 command!      -bang -nargs=? TmuxGFiles                    call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p95%' } : {'tmux': '-p95%'}), <bang>0)',
 command! -bar -bang -nargs=? -complete=buffer TmuxBuffers  call fzf#vim#buffers(<q-args>, fzf#vim#with_preview({ "placeholder": "{1}", 'tmux': '-p95%' }), <bang>0)',
 command!      -bang -nargs=* TmuxAg                        call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
