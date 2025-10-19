@@ -342,14 +342,10 @@ esac
 ########### OS specific settings end ##########
 
 ########## fzf start ########## 
-# C-v checkout branch
-# C-r Search history
-# C-t Search files under the current directory
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_TMUX=1
-export FZF_TMUX_OPTS="--reverse -p95%"
 
 function fzf-checkout-branch() {
   local branches branch
@@ -385,7 +381,7 @@ zle -N fzf-f-locate
 bindkey '^f' fzf-f-locate
 
 function ghq-fzf() {
-  local src=$(ghq list | fzf-tmux -p 95% --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
+  local src=$(ghq list | fzf-tmux -p 95% --reverse --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
   if [ -n "$src" ]; then
     BUFFER="cd $(ghq root)/$src"
     zle accept-line
@@ -397,7 +393,7 @@ bindkey '^]' ghq-fzf
 
 function renlog-fzf() {
   local renlog_log_files=$(find /tmp/renlog -type f -name "*.log" 2>/dev/null)
-  local src=$(echo ${renlog_log_files} | fzf-tmux -p 95% --preview "cat {}")
+  local src=$(echo ${renlog_log_files} | fzf-tmux -p 95% --reverse --preview "cat {}")
   if [ -n "$src" ]; then
     BUFFER="nvim $src"
     zle accept-line
