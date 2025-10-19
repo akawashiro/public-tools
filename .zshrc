@@ -372,19 +372,6 @@ function fzf-checkout-branch() {
 zle     -N   fzf-checkout-branch
 bindkey "^v" fzf-checkout-branch
 
-fzf-z-search() {
-    local res=$(z | sort -rn | cut -c 12- | fzf-tmux -p 95% --reverse)
-    if [ -n "$res" ]; then
-        BUFFER+="cd $res"
-        zle accept-line
-    else
-        return 1
-    fi
-}
-
-zle -N fzf-z-search
-bindkey '^z' fzf-z-search
-
 fzf-f-locate() {
     local res=$(find / 2>/dev/null | fzf-tmux -p 95% --reverse)
     if [ -n "$res" ]; then
@@ -407,12 +394,6 @@ function ghq-fzf() {
 }
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
-
-function ghsearch-fzf() {
-  ghsearch emit | fzf-tmux -p 95% --reverse --preview 'ghsearch preview {} {q}' --preview-window=,~2 | xargs -I{} ghsearch open {}
-}
-zle -N ghsearch-fzf
-bindkey '^g' ghsearch-fzf
 
 ########## fzf end ########## 
 
