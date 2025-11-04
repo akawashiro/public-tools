@@ -58,10 +58,10 @@ export XDG_DATA_HOME=$HOME/.local/share
 function tnew(){
     local current_dir=$(pwd)
     local d=$(basename "${current_dir}" | tr . _)
-    tmux new -s ${d}
+    tmux -2 new -s ${d}
 }
 
-alias ta='tmux a -d -t'
+alias ta='tmux -2 a -d -t'
 alias tls='tmux ls'
 alias tkill='tmux kill-session -t'
 
