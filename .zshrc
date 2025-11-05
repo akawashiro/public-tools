@@ -53,54 +53,15 @@ export XDG_DATA_HOME=$HOME/.local/share
 
 ########## Environment variables end ##########
 
-########## renlog start #########
-# Because renlog launch a new shell, we want to put renlog settings as early as
-# possible to shorten the startup time.
-
-if which renlog > /dev/null 2>&1; then
-    if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
-        renlog_dir=/tmp/renlog
-        exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
-    else
-        eval "$(renlog show-zsh-rc)"
-    fi
-fi
-
-renlog_view_last_cmd() {
-    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
-    if [ -f "${last_log_file}" ]; then
-        nvim "${last_log_file}"
-    else
-        echo "No log file found."
-    fi
-}
-
-zle -N renlog_view_last_cmd
-bindkey '^[1' renlog_view_last_cmd
-
-renlog_gist_last_cmd() {
-    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
-    if [[ ! -e ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh ]]; then
-        echo "Cannot find make-akawashiro-gist.sh"
-        return
-    fi
-    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${last_log_file})
-}
-
-zle -N renlog_gist_last_cmd
-bindkey '^[2' renlog_gist_last_cmd
-
-########## renlog end #########
-
 ########## tmux start ##########
 
 function tnew(){
     local current_dir=$(pwd)
     local d=$(basename "${current_dir}" | tr . _)
-    tmux new -s ${d}
+    tmux -2 new -s ${d}
 }
 
-alias ta='tmux a -d -t'
+alias ta='tmux -2 a -d -t'
 alias tls='tmux ls'
 alias tkill='tmux kill-session -t'
 
@@ -342,14 +303,10 @@ esac
 ########### OS specific settings end ##########
 
 ########## fzf start ########## 
-# C-v checkout branch
-# C-r Search history
-# C-t Search files under the current directory
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_TMUX=1
-export FZF_TMUX_OPTS="--reverse -p95%"
 
 function fzf-checkout-branch() {
   local branches branch
@@ -372,19 +329,6 @@ function fzf-checkout-branch() {
 zle     -N   fzf-checkout-branch
 bindkey "^v" fzf-checkout-branch
 
-fzf-z-search() {
-    local res=$(z | sort -rn | cut -c 12- | fzf-tmux -p 95% --reverse)
-    if [ -n "$res" ]; then
-        BUFFER+="cd $res"
-        zle accept-line
-    else
-        return 1
-    fi
-}
-
-zle -N fzf-z-search
-bindkey '^z' fzf-z-search
-
 fzf-f-locate() {
     local res=$(find / 2>/dev/null | fzf-tmux -p 95% --reverse)
     if [ -n "$res" ]; then
@@ -398,7 +342,7 @@ zle -N fzf-f-locate
 bindkey '^f' fzf-f-locate
 
 function ghq-fzf() {
-  local src=$(ghq list | fzf-tmux -p 95% --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
+  local src=$(ghq list | fzf-tmux -p 95% --reverse --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
   if [ -n "$src" ]; then
     BUFFER="cd $(ghq root)/$src"
     zle accept-line
@@ -408,11 +352,17 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
-function ghsearch-fzf() {
-  ghsearch emit | fzf-tmux -p 95% --reverse --preview 'ghsearch preview {} {q}' --preview-window=,~2 | xargs -I{} ghsearch open {}
+function renlog-fzf() {
+  local renlog_log_files=$(find /tmp/renlog -type f -name "*.log" 2>/dev/null)
+  local src=$(echo ${renlog_log_files} | fzf-tmux -p 95% --reverse --preview "cat {}")
+  if [ -n "$src" ]; then
+    BUFFER="nvim $src"
+    zle accept-line
+  fi
+  zle -R -c
 }
-zle -N ghsearch-fzf
-bindkey '^g' ghsearch-fzf
+zle -N renlog-fzf
+bindkey '^e' renlog-fzf
 
 ########## fzf end ########## 
 
@@ -504,3 +454,42 @@ else
 fi
 
 ########## ssh-agent and tmux end #########
+
+########## renlog start #########
+# Because renlog launch a new shell, we want to put renlog settings as early as
+# possible to shorten the startup time.
+
+if which renlog > /dev/null 2>&1; then
+    if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
+        renlog_dir=/tmp/renlog
+        exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
+    else
+        eval "$(renlog show-zsh-rc)"
+    fi
+fi
+
+renlog_view_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
+    if [ -f "${last_log_file}" ]; then
+        nvim "${last_log_file}"
+    else
+        echo "No log file found."
+    fi
+}
+
+zle -N renlog_view_last_cmd
+bindkey '^[1' renlog_view_last_cmd
+
+renlog_gist_last_cmd() {
+    local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
+    if [[ ! -e ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh ]]; then
+        echo "Cannot find make-akawashiro-gist.sh"
+        return
+    fi
+    ${HOME}/akawashiro-pfn-tools/make-akawashiro-gist.sh $(realpath ${last_log_file})
+}
+
+zle -N renlog_gist_last_cmd
+bindkey '^[2' renlog_gist_last_cmd
+
+########## renlog end #########
