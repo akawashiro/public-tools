@@ -59,7 +59,7 @@ export XDG_DATA_HOME=$HOME/.local/share
 
 if which renlog > /dev/null 2>&1; then
     if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
-        renlog_dir=/tmp/renlog
+        renlog_dir=/tmp/renlog-${USER}
         exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
     else
         eval "$(renlog show-zsh-rc)"
