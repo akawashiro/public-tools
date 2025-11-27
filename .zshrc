@@ -340,6 +340,26 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
+fzf-history-widget() {
+  local selected
+  selected=$(
+    fc -ln 1 \
+    | awk ' {lines[NR]=$0} END { for(i=NR;i>=1;i--){ if(!seen[lines[i]]++){ print lines[i] } } }' \
+    | fzf-tmux -p 95% --reverse --scheme=history
+  ) || return 1
+
+  if [ -n "$selected" ]; then
+    BUFFER="$selected"
+    CURSOR=${#BUFFER}
+    zle redisplay
+  else
+    return 1
+  fi
+}
+
+zle -N fzf-history-widget
+bindkey '^R' fzf-history-widget
+
 ########## fzf end ########## 
 
 ########## wonnix start ##########
