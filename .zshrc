@@ -329,18 +329,6 @@ function fzf-checkout-branch() {
 zle     -N   fzf-checkout-branch
 bindkey "^v" fzf-checkout-branch
 
-fzf-f-locate() {
-    local res=$(find / 2>/dev/null | fzf-tmux -p 95% --reverse)
-    if [ -n "$res" ]; then
-        BUFFER+="$res"
-    else
-        return 1
-    fi
-}
-
-zle -N fzf-f-locate
-bindkey '^f' fzf-f-locate
-
 function ghq-fzf() {
   local src=$(ghq list | fzf-tmux -p 95% --reverse --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
   if [ -n "$src" ]; then
@@ -351,18 +339,6 @@ function ghq-fzf() {
 }
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
-
-function renlog-fzf() {
-  local renlog_log_files=$(find /tmp/renlog -type f -name "*.log" 2>/dev/null)
-  local src=$(echo ${renlog_log_files} | fzf-tmux -p 95% --reverse --preview "cat {}")
-  if [ -n "$src" ]; then
-    BUFFER="nvim $src"
-    zle accept-line
-  fi
-  zle -R -c
-}
-zle -N renlog-fzf
-bindkey '^e' renlog-fzf
 
 ########## fzf end ########## 
 
