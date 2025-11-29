@@ -243,6 +243,8 @@ def generate_html(model: ModelProto) -> str:
     value_producers: Dict[str, List[int]] = {}
     value_consumers: Dict[str, List[int]] = {}
     initializer_names = {init.name for init in graph.initializer}
+    graph_input_names = {inp.name for inp in graph.input}
+    graph_output_names = {out.name for out in graph.output}
 
     for i, node in enumerate(graph.node):
         for inp in node.input:
@@ -259,8 +261,10 @@ def generate_html(model: ModelProto) -> str:
                     value_producers[out] = []
                 value_producers[out].append(i)
 
-    # Add initializers to all_values
+    # Add initializers and graph inputs/outputs to all_values
     all_values.update(initializer_names)
+    all_values.update(graph_input_names)
+    all_values.update(graph_output_names)
 
     if all_values:
         lines.append(f"<h2>Values ({len(all_values)})</h2>")
@@ -292,23 +296,29 @@ def generate_html(model: ModelProto) -> str:
                 lines.append(f"<li>Producer: {', '.join(producer_links)}</li>")
             elif value_name in initializer_names:
                 lines.append("<li>Producer: <strong>(initializer)</strong></li>")
+            elif value_name in graph_input_names:
+                lines.append("<li>Producer: <strong>(graph input)</strong></li>")
             else:
-                lines.append("<li>Producer: (graph input)</li>")
+                lines.append("<li>Producer: (unknown)</li>")
 
             # Consumers
+            consumer_parts = []
             if value_name in value_consumers:
-                consumer_links = []
                 for node_idx in value_consumers[value_name]:
                     node = graph.node[node_idx]
                     node_label = (
                         node.name if node.name else f"{node.op_type}#{node_idx}"
                     )
-                    consumer_links.append(
+                    consumer_parts.append(
                         f'<a href="#node-{node_idx}">{escape(node_label)}</a>'
                     )
-                lines.append(f"<li>Consumer: {', '.join(consumer_links)}</li>")
+            if value_name in graph_output_names:
+                consumer_parts.append("<strong>(graph output)</strong>")
+
+            if consumer_parts:
+                lines.append(f"<li>Consumer: {', '.join(consumer_parts)}</li>")
             else:
-                lines.append("<li>Consumer: (graph output or unused)</li>")
+                lines.append("<li>Consumer: (unused)</li>")
 
             lines.append("</ul>")
             lines.append("</li>")
