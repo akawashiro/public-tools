@@ -329,18 +329,6 @@ function fzf-checkout-branch() {
 zle     -N   fzf-checkout-branch
 bindkey "^v" fzf-checkout-branch
 
-fzf-f-locate() {
-    local res=$(find / 2>/dev/null | fzf-tmux -p 95% --reverse)
-    if [ -n "$res" ]; then
-        BUFFER+="$res"
-    else
-        return 1
-    fi
-}
-
-zle -N fzf-f-locate
-bindkey '^f' fzf-f-locate
-
 function ghq-fzf() {
   local src=$(ghq list | fzf-tmux -p 95% --reverse --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
   if [ -n "$src" ]; then
@@ -352,17 +340,25 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
-function renlog-fzf() {
-  local renlog_log_files=$(find /tmp/renlog -type f -name "*.log" 2>/dev/null)
-  local src=$(echo ${renlog_log_files} | fzf-tmux -p 95% --reverse --preview "cat {}")
-  if [ -n "$src" ]; then
-    BUFFER="nvim $src"
-    zle accept-line
+fzf-history-widget() {
+  local selected
+  selected=$(
+    fc -ln 1 \
+    | awk ' {lines[NR]=$0} END { for(i=NR;i>=1;i--){ if(!seen[lines[i]]++){ print lines[i] } } }' \
+    | fzf-tmux -p 95% --reverse --scheme=history
+  ) || return 1
+
+  if [ -n "$selected" ]; then
+    BUFFER="$selected"
+    CURSOR=${#BUFFER}
+    zle redisplay
+  else
+    return 1
   fi
-  zle -R -c
 }
-zle -N renlog-fzf
-bindkey '^e' renlog-fzf
+
+zle -N fzf-history-widget
+bindkey '^R' fzf-history-widget
 
 ########## fzf end ########## 
 
@@ -461,7 +457,7 @@ fi
 
 if which renlog > /dev/null 2>&1; then
     if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
-        renlog_dir=/tmp/renlog
+        renlog_dir=/tmp/renlog-${USER}
         exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
     else
         eval "$(renlog show-zsh-rc)"
