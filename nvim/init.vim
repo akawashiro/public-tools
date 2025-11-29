@@ -267,6 +267,7 @@ let g:coc_global_extensions = [
     \'coc-clangd',
     \'coc-pyright',
     \'coc-prettier',
+    \'coc-rust-analyzer',
     \]
 
 " Color of Error and Warning
