@@ -16,32 +16,32 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export GOPATH="$HOME/.go"
 export PATH="$GOPATH/bin:$PATH"
 
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-# The next line updates PATH for the Google Cloud SDK.
+########### google-cloud-sdk start ##########
 if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
     echo "Found google-cloud-sdk."
     source "${HOME}/google-cloud-sdk/path.zsh.inc"
 fi
+########### google-cloud-sdk end ##########
 
+########### nvm start ##########
 export NVM_DIR="$HOME/.nvm"
-
-eval "$(pyenv init -)"
-
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+########### nvm end ##########
+
+########## pyenv start ##########
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if which pyenv >/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+fi
+########## pyenv end ##########
 
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
 
 export CROPASS_PASS_DIR="$HOME/Dropbox/cropass-encrypted-passwords"
-
-export CCACHE_DIR=$HOME/.ccache
-export CCACHE_TEMPDIR=$HOME/.ccache
-
-export OCAMLPARAM="_,bin-annot=1"
-export OPAMKEEPBUILDDIR=1
 
 export MANPAGER='nvim +Man!'
 # I don't use C-w
