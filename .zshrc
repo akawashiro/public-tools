@@ -372,14 +372,14 @@ viewonnx() {
     return
   fi
 
-  onnx2html=${HOME}/onnx2html/onnx2html.sh
+  onnx2html=${HOME}/public-tools/onnx2html/onnx2html.sh
   if [ ! -f "${onnx2html}" ]; then
     echo "${onnx2html} not found"
     return
   fi
 
   local html_file=$(mktemp --suffix .html)
-  ${onnx2html} "${onnx}" "${html_file}"
+  ${onnx2html} "${onnx}" -o "${html_file}"
 
   if [ -x "$(command -v w3m)" ]; then
     w3m "${html_file}"
