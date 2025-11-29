@@ -242,6 +242,7 @@ def generate_html(model: ModelProto) -> str:
     all_values = set()
     value_producers: Dict[str, List[int]] = {}
     value_consumers: Dict[str, List[int]] = {}
+    initializer_names = {init.name for init in graph.initializer}
 
     for i, node in enumerate(graph.node):
         for inp in node.input:
@@ -257,6 +258,9 @@ def generate_html(model: ModelProto) -> str:
                 if out not in value_producers:
                     value_producers[out] = []
                 value_producers[out].append(i)
+
+    # Add initializers to all_values
+    all_values.update(initializer_names)
 
     if all_values:
         lines.append(f"<h2>Values ({len(all_values)})</h2>")
@@ -286,8 +290,10 @@ def generate_html(model: ModelProto) -> str:
                         f'<a href="#node-{node_idx}">{escape(node_label)}</a>'
                     )
                 lines.append(f"<li>Producer: {', '.join(producer_links)}</li>")
+            elif value_name in initializer_names:
+                lines.append("<li>Producer: <strong>(initializer)</strong></li>")
             else:
-                lines.append("<li>Producer: (graph input or initializer)</li>")
+                lines.append("<li>Producer: (graph input)</li>")
 
             # Consumers
             if value_name in value_consumers:
@@ -306,18 +312,6 @@ def generate_html(model: ModelProto) -> str:
 
             lines.append("</ul>")
             lines.append("</li>")
-
-        lines.append("</ul>")
-
-    # Initializers
-    if graph.initializer:
-        lines.append(f"<h2>Initializers ({len(graph.initializer)})</h2>")
-        lines.append("<ul>")
-
-        for init in graph.initializer:
-            dtype_name = get_tensor_type_name(init.data_type)
-            shape = str(list(init.dims))
-            lines.append(f"<li>{escape(init.name)}: {dtype_name} {shape}</li>")
 
         lines.append("</ul>")
 
