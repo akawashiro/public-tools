@@ -372,7 +372,7 @@ viewonnx() {
     return
   fi
 
-  onnx2html=${HOME}/public-tools/onnx2html/onnx2html.sh
+  onnx2html=${HOME}/onnx2html/onnx2html.sh
   if [ ! -f "${onnx2html}" ]; then
     echo "${onnx2html} not found"
     return
