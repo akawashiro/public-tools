@@ -362,32 +362,33 @@ bindkey '^R' fzf-history-widget
 
 ########## fzf end ########## 
 
-########## wonnix start ##########
+########## viewonnx start ##########
 
 viewonnx() {
-  onnx=${1?Missing ONNX file path.}
+  local onnx=${1}
 
   if [ ! -f "${onnx}" ]; then
-    printf "File not foud: \e[1m${onnx}\x1B[0m\n"
+    echo ${onnx} not found
     return
   fi
 
-  if [ ! -e $HOME/onnx2html.py ]; then
-    curl https://raw.githubusercontent.com/shinh/test/master/onnx2html.py > $HOME/onnx2html.py
+  onnx2html=${HOME}/public-tools/onnx2html/onnx2html.sh
+  if [ ! -f "${onnx2html}" ]; then
+    echo "${onnx2html} not found"
+    return
   fi
 
-  tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/onnx2html.XXXXXXXXXX")
-
-  python3 $HOME/onnx2html.py "${onnx}" "${tmpdir}/onnx.html"
+  local html_file=$(mktemp --suffix .html)
+  ${onnx2html} "${onnx}" "${html_file}"
 
   if [ -x "$(command -v w3m)" ]; then
-    w3m "${tmpdir}/onnx.html"
+    w3m "${html_file}"
   fi
 
-  printf "Generated html at \e[4m\e[1m${tmpdir}/onnx.html\x1B[0m\n"
+  echo "Opening ${html_file} ..."
 }
 
-########## wonnix end ##########
+########## viewonnx end ##########
 
 ########## Load machine specific settings start ##########
 
