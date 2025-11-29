@@ -115,30 +115,6 @@ def generate_html(model: ModelProto) -> str:
     lines.append("</head>")
     lines.append("<body>")
 
-    # Model metadata
-    lines.append("<h1>ONNX Model</h1>")
-    lines.append("<ul>")
-
-    if model.producer_name:
-        lines.append(f"<li>Producer: {escape(model.producer_name)}</li>")
-
-    if model.producer_version:
-        lines.append(f"<li>Producer Version: {escape(model.producer_version)}</li>")
-
-    if model.model_version:
-        lines.append(f"<li>Model Version: {model.model_version}</li>")
-
-    lines.append(f"<li>IR Version: {model.ir_version}</li>")
-
-    if model.opset_import:
-        opsets = ", ".join(
-            f"{op.domain if op.domain else 'ai.onnx'}:{op.version}"
-            for op in model.opset_import
-        )
-        lines.append(f"<li>Opset: {escape(opsets)}</li>")
-
-    lines.append("</ul>")
-
     graph = model.graph
 
     # Build value info map
@@ -159,7 +135,12 @@ def generate_html(model: ModelProto) -> str:
     if graph.input:
         lines.append("<ul>")
         for inp in graph.input:
-            lines.append(f"<li>{escape(format_value_info(inp))}</li>")
+            value_link = f'<a href="#value-{escape(inp.name)}">{escape(inp.name)}</a>'
+            type_shape = format_value_info(inp).split(": ", 1)
+            if len(type_shape) > 1:
+                lines.append(f"<li>{value_link}: {escape(type_shape[1])}</li>")
+            else:
+                lines.append(f"<li>{value_link}</li>")
         lines.append("</ul>")
     else:
         lines.append("<p>No inputs</p>")
@@ -169,7 +150,12 @@ def generate_html(model: ModelProto) -> str:
     if graph.output:
         lines.append("<ul>")
         for out in graph.output:
-            lines.append(f"<li>{escape(format_value_info(out))}</li>")
+            value_link = f'<a href="#value-{escape(out.name)}">{escape(out.name)}</a>'
+            type_shape = format_value_info(out).split(": ", 1)
+            if len(type_shape) > 1:
+                lines.append(f"<li>{value_link}: {escape(type_shape[1])}</li>")
+            else:
+                lines.append(f"<li>{value_link}</li>")
         lines.append("</ul>")
     else:
         lines.append("<p>No outputs</p>")
@@ -324,6 +310,30 @@ def generate_html(model: ModelProto) -> str:
             lines.append("</li>")
 
         lines.append("</ul>")
+
+    # Model metadata (at the end)
+    lines.append("<h2>ONNX Model</h2>")
+    lines.append("<ul>")
+
+    if model.producer_name:
+        lines.append(f"<li>Producer: {escape(model.producer_name)}</li>")
+
+    if model.producer_version:
+        lines.append(f"<li>Producer Version: {escape(model.producer_version)}</li>")
+
+    if model.model_version:
+        lines.append(f"<li>Model Version: {model.model_version}</li>")
+
+    lines.append(f"<li>IR Version: {model.ir_version}</li>")
+
+    if model.opset_import:
+        opsets = ", ".join(
+            f"{op.domain if op.domain else 'ai.onnx'}:{op.version}"
+            for op in model.opset_import
+        )
+        lines.append(f"<li>Opset: {escape(opsets)}</li>")
+
+    lines.append("</ul>")
 
     lines.append("</body>")
     lines.append("</html>")
