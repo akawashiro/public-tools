@@ -289,9 +289,9 @@ nmap <silent> <Leader>cd <Plug>(coc-definition)
 nmap <silent> <Leader>cr <Plug>(coc-references)
 nmap <silent> <Leader>cf <Plug>(coc-format)
 nmap <silent> <Leader>cx <Plug>(coc-fix-current)
-nnoremap <silent> <Leader>cs :call ShowDocumentation()<CR>
+nnoremap <silent> <Leader>cs :call CocShowDocumentation()<CR>
 
-function! ShowDocumentation()
+function! CocShowDocumentation()
   if CocAction('hasProvider', 'hover')
     call CocActionAsync('doHover')
   else
