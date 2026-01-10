@@ -17,7 +17,6 @@ endif
 
 call plug#begin()
 
-Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-rhubarb'
 Plug 'mechatroner/rainbow_csv'
 Plug 'chrisbra/Colorizer'
@@ -299,13 +298,6 @@ endfunction
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " ========== end coc ==========
-
-" ========== easymotion start ==========
-
-map <Leader>e <Plug>(easymotion-prefix)
-
-" ========== easymotion end ==========
-
 
 " ========== a.vim start ==========
 
