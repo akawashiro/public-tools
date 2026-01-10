@@ -112,12 +112,6 @@ let g:github_enterprise_urls = ['https://github.pfidev.jp']
 
 " ========== rhubarb.vim end ===========
 
-" ========== clang_format start ===========
-
-let g:clang_format#auto_format = 0
-
-" ========== clang_format end ===========
-
 " ========== fzf start ===========
 
 let $FZF_DEFAULT_OPTS="--layout=reverse --border"
