@@ -132,24 +132,37 @@ let g:fzf_colors = {
 
 command! -bang -nargs=? -complete=dir TmuxFiles
     \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
+
 command! -bang -nargs=? TmuxGitFiles
     \ call fzf#vim#gitfiles(<q-args>, 
     \   fzf#vim#with_preview(
     \     <q-args> == "?" ? { "placeholder": "", 'tmux': '-p95%' } : {'tmux': '-p95%'}), <bang>0)',
+
 command! -bar -bang -nargs=? -complete=buffer TmuxBuffers
     \ call fzf#vim#buffers(<q-args>, fzf#vim#with_preview({ "placeholder": "{1}", 'tmux': '-p95%' }), <bang>0)',
+
 command! -bang -nargs=* TmuxAg
     \ call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
-command! -bang -nargs=* TmuxGitGrepCurrentWord
-    \ call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 
+
+command! -bang -nargs=* TmuxGitGrepCurrentWordUnderCurrentDir
+    \ call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)).' .',
+    \   0,
+    \   fzf#vim#with_preview({'options': ['--query', expand('<cword>')],
+    \   'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p95%'}),
+    \   <bang>0)
+
+command! -bang -nargs=* TmuxGitGrepCurrentWordWholeRepo
+    \ call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)),
     \   0,
     \   fzf#vim#with_preview({'options': ['--query', expand('<cword>')],
     \   'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p95%'}), 
     \   <bang>0)
+
 command! -bang -nargs=* TmuxGitGrepUnderCurrentDir
     \ call fzf#vim#grep(
     \   'git grep --line-number -- '.shellescape(<q-args>).' .', 0,
     \   fzf#vim#with_preview({'dir': '.', 'options': '--delimiter : --nth 3..', 'tmux': '-p95%'}), <bang>0)
+
 command! -bang -nargs=* TmuxGitGrepWholeRepo
     \ call fzf#vim#grep(
     \   'git grep --line-number -- '.shellescape(<q-args>), 0,
@@ -157,13 +170,14 @@ command! -bang -nargs=* TmuxGitGrepWholeRepo
     \     'options': '--delimiter : --nth 3..', 'tmux': '-p95%'}),
     \     <bang>0)
 
-noremap <Leader>fgf :TmuxGitFiles<CR>
-noremap <Leader>fgg :TmuxGitGrepUnderCurrentDir<CR>
-noremap <Leader>fgw :TmuxGitGrepWholeRepo<CR>
-noremap <Leader>fgc :TmuxGitGrepCurrentWord<CR>
-noremap <Leader>ff :TmuxFiles<CR>
-noremap <Leader>fa :TmuxAg<CR>
-noremap <Leader>fb :TmuxBuffers<CR>
+noremap <Leader>fgf  :TmuxGitFiles<CR>
+noremap <Leader>fgg  :TmuxGitGrepUnderCurrentDir<CR>
+noremap <Leader>fgwg :TmuxGitGrepWholeRepo<CR>
+noremap <Leader>fgc  :TmuxGitGrepCurrentWordUnderCurrentDir<CR>
+noremap <Leader>fgwc :TmuxGitGrepCurrentWordWholeRepo<CR>
+noremap <Leader>ff   :TmuxFiles<CR>
+noremap <Leader>fa   :TmuxAg<CR>
+noremap <Leader>fb   :TmuxBuffers<CR>
 
 " ========== fzf end ===========
 
