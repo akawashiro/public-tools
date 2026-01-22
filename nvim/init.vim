@@ -145,30 +145,43 @@ command! -bang -nargs=* TmuxAg
     \ call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
 
 command! -bang -nargs=* TmuxGitGrepCurrentWordUnderCurrentDir
-    \ call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)).' .',
+    \ call fzf#vim#grep(
+    \   'git grep --line-number -- '.shellescape(expand(<q-args>)).' .',
     \   0,
-    \   fzf#vim#with_preview({'options': ['--query', expand('<cword>')],
-    \   'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p95%'}),
+    \   fzf#vim#with_preview({
+    \     'dir': '.',
+    \     'options': ['--query', expand('<cword>')],
+    \     'tmux': '-p95%'}),
     \   <bang>0)
 
 command! -bang -nargs=* TmuxGitGrepCurrentWordWholeRepo
-    \ call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)),
+    \ call fzf#vim#grep(
+    \   'git grep --line-number -- '.shellescape(expand(<q-args>)),
     \   0,
-    \   fzf#vim#with_preview({'options': ['--query', expand('<cword>')],
-    \   'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p95%'}), 
+    \   fzf#vim#with_preview({
+    \     'dir': systemlist('git rev-parse --show-toplevel')[0],
+    \     'options': ['--query', expand('<cword>')],
+    \     'tmux': '-p95%'}),
     \   <bang>0)
 
 command! -bang -nargs=* TmuxGitGrepUnderCurrentDir
     \ call fzf#vim#grep(
-    \   'git grep --line-number -- '.shellescape(<q-args>).' .', 0,
-    \   fzf#vim#with_preview({'dir': '.', 'options': '--delimiter : --nth 3..', 'tmux': '-p95%'}), <bang>0)
+    \   'git grep --line-number -- '.shellescape(<q-args>).' .',
+    \   0,
+    \   fzf#vim#with_preview({
+    \     'dir': '.',
+    \     'options': '--delimiter : --nth 3..',
+    \     'tmux': '-p95%'}),
+    \   <bang>0)
 
 command! -bang -nargs=* TmuxGitGrepWholeRepo
     \ call fzf#vim#grep(
     \   'git grep --line-number -- '.shellescape(<q-args>), 0,
-    \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0],
-    \     'options': '--delimiter : --nth 3..', 'tmux': '-p95%'}),
-    \     <bang>0)
+    \   fzf#vim#with_preview({
+    \     'dir': systemlist('git rev-parse --show-toplevel')[0],
+    \     'options': '--delimiter : --nth 3..',
+    \     'tmux': '-p95%'}),
+    \   <bang>0)
 
 noremap <Leader>fgf  :TmuxGitFiles<CR>
 noremap <Leader>fgg  :TmuxGitGrepUnderCurrentDir<CR>
