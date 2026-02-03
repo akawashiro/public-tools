@@ -475,7 +475,7 @@ renlog_view_last_cmd() {
 }
 
 zle -N renlog_view_last_cmd
-bindkey '^[1' renlog_view_last_cmd
+bindkey -s '^[1' 'renlog_view_last_cmd\n'
 
 renlog_gist_last_cmd() {
     local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
@@ -487,6 +487,6 @@ renlog_gist_last_cmd() {
 }
 
 zle -N renlog_gist_last_cmd
-bindkey '^[2' renlog_gist_last_cmd
+bindkey -s '^[2' 'renlog_gist_last_cmd\n'
 
 ########## renlog end #########
