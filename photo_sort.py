@@ -119,10 +119,6 @@ def process(src_dir: Path, dst_dir: Path, tz, dry_run=False, delete_original=Fal
     seen_hashes = set()
     for path in collect_files(src_dir):
         h = sha256_file(path)
-        if h in seen_hashes:
-            _logger.warning(f"SKIP duplicate {path}")
-            continue
-        seen_hashes.add(h)
         dt = get_capture_time(path)
         ts = format_timestamp(dt, tz)
         new_name = ts + "-" + h[:8] + path.suffix.lower()
@@ -130,9 +126,13 @@ def process(src_dir: Path, dst_dir: Path, tz, dry_run=False, delete_original=Fal
         _logger.info(f"{path} -> {dst}")
 
         if not dry_run:
+            if h in seen_hashes:
+                _logger.warning(f"SKIP duplicate {path}")
+                continue
             shutil.copy(path, dst)
         if delete_original:
             shutil.rmtree(path)
+        seen_hashes.add(h)
 
 
 def main():
