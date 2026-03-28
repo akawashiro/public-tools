@@ -14,32 +14,32 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export GOPATH="$HOME/.go"
 export PATH="$GOPATH/bin:$PATH"
 
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-# The next line updates PATH for the Google Cloud SDK.
+########### google-cloud-sdk start ##########
 if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
     echo "Found google-cloud-sdk."
     source "${HOME}/google-cloud-sdk/path.zsh.inc"
 fi
+########### google-cloud-sdk end ##########
 
+########### nvm start ##########
 export NVM_DIR="$HOME/.nvm"
-
-eval "$(pyenv init -)"
-
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+########### nvm end ##########
+
+########## pyenv start ##########
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if which pyenv >/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+fi
+########## pyenv end ##########
 
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
 
 export CROPASS_PASS_DIR="$HOME/Dropbox/cropass-encrypted-passwords"
-
-export CCACHE_DIR=$HOME/.ccache
-export CCACHE_TEMPDIR=$HOME/.ccache
-
-export OCAMLPARAM="_,bin-annot=1"
-export OPAMKEEPBUILDDIR=1
 
 export MANPAGER='nvim +Man!'
 # I don't use C-w
@@ -56,10 +56,10 @@ export XDG_DATA_HOME=$HOME/.local/share
 function tnew(){
     local current_dir=$(pwd)
     local d=$(basename "${current_dir}" | tr . _)
-    tmux new -s ${d}
+    tmux -2 new -s ${d}
 }
 
-alias ta='tmux a -d -t'
+alias ta='tmux -2 a -d -t'
 alias tls='tmux ls'
 alias tkill='tmux kill-session -t'
 
@@ -327,18 +327,6 @@ function fzf-checkout-branch() {
 zle     -N   fzf-checkout-branch
 bindkey "^v" fzf-checkout-branch
 
-fzf-f-locate() {
-    local res=$(find / 2>/dev/null | fzf-tmux -p 95% --reverse)
-    if [ -n "$res" ]; then
-        BUFFER+="$res"
-    else
-        return 1
-    fi
-}
-
-zle -N fzf-f-locate
-bindkey '^f' fzf-f-locate
-
 function ghq-fzf() {
   local src=$(ghq list | fzf-tmux -p 95% --reverse --preview "ls -la $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
   if [ -n "$src" ]; then
@@ -350,46 +338,55 @@ function ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^]' ghq-fzf
 
-function renlog-fzf() {
-  local renlog_log_files=$(find /tmp/renlog -type f -name "*.log" 2>/dev/null)
-  local src=$(echo ${renlog_log_files} | fzf-tmux -p 95% --reverse --preview "cat {}")
-  if [ -n "$src" ]; then
-    BUFFER="nvim $src"
-    zle accept-line
+fzf-history-widget() {
+  local selected
+  selected=$(
+    fc -ln 1 \
+    | awk ' {lines[NR]=$0} END { for(i=NR;i>=1;i--){ if(!seen[lines[i]]++){ print lines[i] } } }' \
+    | fzf-tmux -p 95% --reverse --scheme=history
+  ) || return 1
+
+  if [ -n "$selected" ]; then
+    BUFFER="$selected"
+    CURSOR=${#BUFFER}
+    zle redisplay
+  else
+    return 1
   fi
-  zle -R -c
 }
-zle -N renlog-fzf
-bindkey '^e' renlog-fzf
+
+zle -N fzf-history-widget
+bindkey '^R' fzf-history-widget
 
 ########## fzf end ########## 
 
-########## wonnix start ##########
+########## viewonnx start ##########
 
 viewonnx() {
-  onnx=${1?Missing ONNX file path.}
+  local onnx=${1}
 
   if [ ! -f "${onnx}" ]; then
-    printf "File not foud: \e[1m${onnx}\x1B[0m\n"
+    echo ${onnx} not found
     return
   fi
 
-  if [ ! -e $HOME/onnx2html.py ]; then
-    curl https://raw.githubusercontent.com/shinh/test/master/onnx2html.py > $HOME/onnx2html.py
+  onnx2html=${HOME}/public-tools/onnx2html/onnx2html.sh
+  if [ ! -f "${onnx2html}" ]; then
+    echo "${onnx2html} not found"
+    return
   fi
 
-  tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/onnx2html.XXXXXXXXXX")
-
-  python3 $HOME/onnx2html.py "${onnx}" "${tmpdir}/onnx.html"
+  local html_file=$(mktemp --suffix .html)
+  ${onnx2html} "${onnx}" -o "${html_file}"
 
   if [ -x "$(command -v w3m)" ]; then
-    w3m "${tmpdir}/onnx.html"
+    w3m "${html_file}"
   fi
 
-  printf "Generated html at \e[4m\e[1m${tmpdir}/onnx.html\x1B[0m\n"
+  echo "Opening ${html_file} ..."
 }
 
-########## wonnix end ##########
+########## viewonnx end ##########
 
 ########## Load machine specific settings start ##########
 
@@ -459,7 +456,7 @@ fi
 
 if which renlog > /dev/null 2>&1; then
     if [[ "$(ps -o comm= -p $PPID)" != "renlog" ]]; then
-        renlog_dir=/tmp/renlog
+        renlog_dir=/tmp/renlog-${USER}
         exec renlog --log-level info log --renlog-dir ${renlog_dir} --cmd 'zsh -l'
     else
         eval "$(renlog show-zsh-rc)"
@@ -476,7 +473,7 @@ renlog_view_last_cmd() {
 }
 
 zle -N renlog_view_last_cmd
-bindkey '^[1' renlog_view_last_cmd
+bindkey -s '^[1' 'renlog_view_last_cmd\n'
 
 renlog_gist_last_cmd() {
     local last_log_file=$(cat ${RENLOG_LAST_LOG_FILE})
@@ -488,6 +485,6 @@ renlog_gist_last_cmd() {
 }
 
 zle -N renlog_gist_last_cmd
-bindkey '^[2' renlog_gist_last_cmd
+bindkey -s '^[2' 'renlog_gist_last_cmd\n'
 
 ########## renlog end #########

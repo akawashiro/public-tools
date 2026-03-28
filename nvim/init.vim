@@ -17,7 +17,6 @@ endif
 
 call plug#begin()
 
-Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-rhubarb'
 Plug 'mechatroner/rainbow_csv'
 Plug 'chrisbra/Colorizer'
@@ -113,12 +112,6 @@ let g:github_enterprise_urls = ['https://github.pfidev.jp']
 
 " ========== rhubarb.vim end ===========
 
-" ========== clang_format start ===========
-
-let g:clang_format#auto_format = 0
-
-" ========== clang_format end ===========
-
 " ========== fzf start ===========
 
 let $FZF_DEFAULT_OPTS="--layout=reverse --border"
@@ -137,22 +130,80 @@ let g:fzf_colors = {
     \ 'spinner': ['fg', 'Label'],   
     \ 'header':  ['fg', 'Comment'] }
 
-command!      -bang -nargs=? -complete=dir TmuxFiles       call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
-command!      -bang -nargs=? TmuxGFiles                    call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(<q-args> == "?" ? { "placeholder": "", 'tmux': '-p95%' } : {'tmux': '-p95%'}), <bang>0)',
-command! -bar -bang -nargs=? -complete=buffer TmuxBuffers  call fzf#vim#buffers(<q-args>, fzf#vim#with_preview({ "placeholder": "{1}", 'tmux': '-p95%' }), <bang>0)',
-command!      -bang -nargs=* TmuxAg                        call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
-command! -bang -nargs=* TmuxGCGrep call fzf#vim#grep('git grep --line-number -- '.shellescape(expand(<q-args>)), 0, fzf#vim#with_preview({'options': ['--query', expand('<cword>')], 'dir': systemlist('git rev-parse --show-toplevel')[0], 'tmux': '-p95%'}), <bang>0)
-command! -bang -nargs=* TmuxGGrep
-  \ call fzf#vim#grep(
-  \   'git grep --line-number -- '.shellescape(<q-args>), 0,
-  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0], 'options': '--delimiter : --nth 3..', 'tmux': '-p95%'}), <bang>0)
+command! -bang -nargs=? -complete=dir TmuxFiles
+    \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
 
-noremap <Leader>ff :TmuxFiles<CR>
-noremap <Leader>fgf :TmuxGFiles<CR>
-noremap <Leader>fgg :TmuxGGrep<CR>
-noremap <Leader>fgc :TmuxGCGrep<CR>
-noremap <Leader>fa :TmuxAg<CR>
-noremap <Leader>fb :TmuxBuffers<CR>
+command! -bang -nargs=? TmuxGitFilesWholeRepo
+   \ call fzf#vim#gitfiles(<q-args>, 
+   \   fzf#vim#with_preview(
+   \     <q-args> == "?" ? { "placeholder": "", 'tmux': '-p95%' } : {'tmux': '-p95%'}), <bang>0)',
+
+command! -bang -nargs=? TmuxGitFilesUnderCurrentDir
+  \ call fzf#vim#gitfiles(
+  \   <q-args>,
+  \   fzf#vim#with_preview(
+  \     extend(
+  \       <q-args> == "?" ? {'placeholder': '', 'tmux': '-p95%'} : {'tmux': '-p95%'},
+  \       {'dir': getcwd()}
+  \     )
+  \   ),
+  \   <bang>0
+  \ )
+
+command! -bar -bang -nargs=? -complete=buffer TmuxBuffers
+    \ call fzf#vim#buffers(<q-args>, fzf#vim#with_preview({ "placeholder": "{1}", 'tmux': '-p95%' }), <bang>0)',
+
+command! -bang -nargs=* TmuxAg
+    \ call fzf#vim#ag(<q-args>, fzf#vim#with_preview({'tmux': '-p95%'}), <bang>0)',
+
+command! -bang -nargs=* TmuxGitGrepCurrentWordUnderCurrentDir
+    \ call fzf#vim#grep(
+    \   'git grep --line-number -- '.shellescape(expand(<q-args>)).' .',
+    \   0,
+    \   fzf#vim#with_preview({
+    \     'dir': '.',
+    \     'options': ['--query', expand('<cword>')],
+    \     'tmux': '-p95%'}),
+    \   <bang>0)
+
+command! -bang -nargs=* TmuxGitGrepCurrentWordWholeRepo
+    \ call fzf#vim#grep(
+    \   'git grep --line-number -- '.shellescape(expand(<q-args>)),
+    \   0,
+    \   fzf#vim#with_preview({
+    \     'dir': systemlist('git rev-parse --show-toplevel')[0],
+    \     'options': ['--query', expand('<cword>')],
+    \     'tmux': '-p95%'}),
+    \   <bang>0)
+
+command! -bang -nargs=* TmuxGitGrepUnderCurrentDir
+    \ call fzf#vim#grep(
+    \   'git grep --line-number -- '.shellescape(<q-args>).' .',
+    \   0,
+    \   fzf#vim#with_preview({
+    \     'dir': '.',
+    \     'options': '--delimiter : --nth 3..',
+    \     'tmux': '-p95%'}),
+    \   <bang>0)
+
+command! -bang -nargs=* TmuxGitGrepWholeRepo
+    \ call fzf#vim#grep(
+    \   'git grep --line-number -- '.shellescape(<q-args>), 0,
+    \   fzf#vim#with_preview({
+    \     'dir': systemlist('git rev-parse --show-toplevel')[0],
+    \     'options': '--delimiter : --nth 3..',
+    \     'tmux': '-p95%'}),
+    \   <bang>0)
+
+noremap <Leader>fgf  :TmuxGitFilesUnderCurrentDir<CR>
+noremap <Leader>fgwf :TmuxGitFilesWholeRepo<CR>
+noremap <Leader>fgg  :TmuxGitGrepUnderCurrentDir<CR>
+noremap <Leader>fgwg :TmuxGitGrepWholeRepo<CR>
+noremap <Leader>fgc  :TmuxGitGrepCurrentWordUnderCurrentDir<CR>
+noremap <Leader>fgwc :TmuxGitGrepCurrentWordWholeRepo<CR>
+noremap <Leader>ff   :TmuxFiles<CR>
+noremap <Leader>fa   :TmuxAg<CR>
+noremap <Leader>fb   :TmuxBuffers<CR>
 
 " ========== fzf end ===========
 
@@ -267,6 +318,7 @@ let g:coc_global_extensions = [
     \'coc-clangd',
     \'coc-pyright',
     \'coc-prettier',
+    \'coc-rust-analyzer',
     \]
 
 " Color of Error and Warning
@@ -277,9 +329,9 @@ nmap <silent> <Leader>cd <Plug>(coc-definition)
 nmap <silent> <Leader>cr <Plug>(coc-references)
 nmap <silent> <Leader>cf <Plug>(coc-format)
 nmap <silent> <Leader>cx <Plug>(coc-fix-current)
-nnoremap <silent> <Leader>cs :call ShowDocumentation()<CR>
+nnoremap <silent> <Leader>cs :call CocShowDocumentation()<CR>
 
-function! ShowDocumentation()
+function! CocShowDocumentation()
   if CocAction('hasProvider', 'hover')
     call CocActionAsync('doHover')
   else
@@ -293,13 +345,6 @@ endfunction
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " ========== end coc ==========
-
-" ========== easymotion start ==========
-
-map <Leader>e <Plug>(easymotion-prefix)
-
-" ========== easymotion end ==========
-
 
 " ========== a.vim start ==========
 
