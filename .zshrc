@@ -18,6 +18,11 @@ export PATH="$GOPATH/bin:$PATH"
 
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+zshrc_dir="${${(%):-%N}:A:h}"
+if [ -f "$zshrc_dir/fine_grained_pat_of_github_for_gh_command" ]; then
+  source "$zshrc_dir/fine_grained_pat_of_github_for_gh_command"
+fi
+
 ########### google-cloud-sdk start ##########
 if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
     echo "Found google-cloud-sdk."
