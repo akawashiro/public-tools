@@ -319,6 +319,7 @@ let g:coc_global_extensions = [
     \'coc-pyright',
     \'coc-prettier',
     \'coc-rust-analyzer',
+    \'coc-tsserver',
     \]
 
 " Color of Error and Warning
