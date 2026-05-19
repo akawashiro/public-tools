@@ -185,8 +185,47 @@ bindkey -v
 
 # History setting
 HISTFILE=~/.zsh_history
-HISTSIZE=1000000
-SAVEHIST=1000000
+HISTSIZE=100000000
+SAVEHIST=100000000
+
+setopt HIST_IGNORE_SPACE
+setopt HIST_REDUCE_BLANKS
+setopt HIST_IGNORE_DUPS
+setopt HIST_SAVE_NO_DUPS
+
+# Replace passwords with ****** in .zsh_history
+zshaddhistory() {
+  emulate -L zsh
+
+  local line="${1%%$'\n'}"
+
+  # Do not save if the command starts with space
+  [[ "$line" == ' '* ]] && return 1
+
+  # Do not save if clearly unsafe
+  [[ "$line" =~ 'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+' ]] && return 1
+  [[ "$line" =~ 'BEGIN .*PRIVATE KEY' ]] && return 1
+
+  line=$(printf '%s\n' "$line" | perl -pe '
+    s/(([A-Za-z_][A-Za-z0-9_]*(?:_PASS_|_PASS$|PASS_|_PASSWORD_|_PASSWORD$|PASSWORD_|_PASSWD_|_PASSWD$|PASSWD_|_PASSPHRASE_|_PASSPHRASE$|PASSPHRASE_|_SECRET_|_SECRET$|SECRET_|_TOKEN_|_TOKEN$|TOKEN_|_API_KEY_|_API_KEY$|API_KEY_|_APIKEY_|_APIKEY$|APIKEY_|_ACCESS_KEY_|_ACCESS_KEY$|ACCESS_KEY_)[A-Za-z0-9_]*|password|passwd|passphrase|secret|token|api[_-]?key|access[_-]?key)\s*=\s*)("[^"]*"|'\''[^'\'']*'\''|[^[:space:]]+)/$1******/ig;
+
+    s/((?:--password|--passwd|--passphrase|--secret|--token|--api-key|--apikey|--access-key)\s+)(("[^"]*")|('\''[^'\'']*'\'')|[^[:space:]]+)/$1******/ig;
+    s/((?:--password|--passwd|--passphrase|--secret|--token|--api-key|--apikey|--access-key)=)(("[^"]*")|('\''[^'\'']*'\'')|[^[:space:]]+)/$1******/ig;
+
+    s/(Authorization:\s*Bearer\s+)[^"'\''[:space:]]+/${1}******/ig;
+    s/(Bearer\s+)[A-Za-z0-9._~+\/=-]{16,}/${1}******/g;
+  ')
+
+  if [[ "$line" =~ '(^|[[:space:]])(docker[[:space:]]+login|mysql|psql|redis-cli)([[:space:]]|$)' ]]; then
+    line=$(printf '%s\n' "$line" | perl -pe '
+      s/((-p|--password)\s+)(("[^"]*")|('\''[^'\'']*'\'')|[^[:space:]]+)/$1******/ig;
+      s/((-p|--password)=)(("[^"]*")|('\''[^'\'']*'\'')|[^[:space:]]+)/$1******/ig;
+    ')
+  fi
+
+  print -sr -- "$line"
+  return 1
+}
 
 # 単語の区切り文字を指定する
 autoload -Uz select-word-style
@@ -225,11 +264,9 @@ setopt ignore_eof
 # '#' 以降をコメントとして扱う
 setopt interactive_comments
 
-# ディレクトリ名だけでcdする
-setopt auto_cd
-
 # cd したら自動的にpushdする
 setopt auto_pushd
+
 # 重複したディレクトリを追加しない
 setopt pushd_ignore_dups
 
