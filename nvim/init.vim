@@ -92,25 +92,16 @@ set completeopt=menuone
 " Search selected words with * even if in visual mode
 vnoremap <silent> * "vy/\V<C-r>=substitute(escape(@v,'\/'),"\n",'\\n','g')<CR><CR>
 
+" Copy the full path of the current file
+command! CopyFullPath let @+=expand('%:p')
+
 " ========== nvim end ==========
-
-" ========== deoplete start ==========
-
-let g:deoplete#enable_at_startup = 1
-
-" ========== deoplete end ==========
 
 " ========== julia start ==========
 
 autocmd BufNewFile,BufRead *.jl setfiletype julia
 
 " ========== julia end ==========
-
-" ========== rhubarb.vim start ===========
-
-let g:github_enterprise_urls = ['https://github.pfidev.jp']
-
-" ========== rhubarb.vim end ===========
 
 " ========== fzf start ===========
 
