@@ -21,6 +21,11 @@ if [ -f "$zshrc_dir/fine_grained_pat_of_github_for_gh_command" ]; then
   source "$zshrc_dir/fine_grained_pat_of_github_for_gh_command"
 fi
 
+if [ -d /mnt/pvc-home/akirakawata/ ]; then
+    mkdir -p /mnt/pvc-home/akirakawata/.codex
+    export CODEX_HOME="/mnt/pvc-home/akirakawata/.codex"
+fi
+
 ########### google-cloud-sdk start ##########
 if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
     echo "Found google-cloud-sdk."
