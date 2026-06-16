@@ -186,8 +186,8 @@ command! -bang -nargs=* TmuxGitGrepWholeRepo
     \     'tmux': '-p95%'}),
     \   <bang>0)
 
-noremap <Leader>fgf  :TmuxGitFilesUnderCurrentDir<CR>
-noremap <Leader>fgwf :TmuxGitFilesWholeRepo<CR>
+" noremap <Leader>fgf  :TmuxGitFilesUnderCurrentDir<CR>
+noremap <Leader>fgf :TmuxGitFilesWholeRepo<CR>
 noremap <Leader>fgg  :TmuxGitGrepUnderCurrentDir<CR>
 noremap <Leader>fgwg :TmuxGitGrepWholeRepo<CR>
 noremap <Leader>fgc  :TmuxGitGrepCurrentWordUnderCurrentDir<CR>
