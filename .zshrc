@@ -104,8 +104,8 @@ function glm(){
     git checkout ${master_or_main}
     git switch --create ${backup_branch}
     git branch -D ${master_or_main}
-    git fetch upstream ${master_or_main}
-    git switch --create ${master_or_main} upstream/${master_or_main}
+    git fetch origin ${master_or_main}
+    git switch --create ${master_or_main} origin/${master_or_main}
 }
 
 function grm(){
