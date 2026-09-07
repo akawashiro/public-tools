@@ -1,4 +1,5 @@
 import argparse
+import fnmatch
 import hashlib
 import json
 import os
@@ -111,7 +112,7 @@ def sha256_file(path: Path, chunk=1024 * 1024):
     return h.hexdigest()
 
 
-def collect_files(src: Path) -> list[Path]:
+def collect_files(src: Path, exclude_pattern: str | None = None) -> list[Path]:
     _logger.info(f"Start collecting files under {src}")
     fs: list[Path] = []
     stack = [os.fspath(src)]
@@ -120,6 +121,13 @@ def collect_files(src: Path) -> list[Path]:
         with os.scandir(directory) as entries:
             _logger.info(f"Scanning {directory}")
             for entry in entries:
+                relative_path = os.path.relpath(entry.path, src)
+                if exclude_pattern and (
+                    fnmatch.fnmatch(entry.name, exclude_pattern)
+                    or fnmatch.fnmatch(relative_path, exclude_pattern)
+                ):
+                    _logger.info(f"Excluding {entry.path}")
+                    continue
                 if entry.is_dir(follow_symlinks=False):
                     stack.append(entry.path)
                     continue
@@ -130,9 +138,16 @@ def collect_files(src: Path) -> list[Path]:
     return fs
 
 
-def process(src_dir: Path, dst_dir: Path, tz, dry_run=False, delete_original=False):
+def process(
+    src_dir: Path,
+    dst_dir: Path,
+    tz,
+    dry_run=False,
+    delete_original=False,
+    exclude_pattern: str | None = None,
+):
     seen_hashes = set()
-    ps = collect_files(src_dir)
+    ps = collect_files(src_dir, exclude_pattern)
     for path in ps:
         h = sha256_file(path)
         dt = get_capture_time(path)
@@ -155,7 +170,7 @@ def main():
     parser = argparse.ArgumentParser(
             description="""
 Copy photos/videos and rename by capture time.
-Example: ./photo_sort.sh /media/akira/QNAPTS230/UploadedPictures /media/akira/QNAPTS230/Pictures""",
+Example: ./photo_sort.sh --exclude-pattern "@Recently-Snapshot" /media/akira/QNAPTS230/UploadedPictures /media/akira/QNAPTS230/Pictures""",
             formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("source", type=Path, help="source directory")
@@ -165,6 +180,10 @@ Example: ./photo_sort.sh /media/akira/QNAPTS230/UploadedPictures /media/akira/QN
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="show operations without copying"
+    )
+    parser.add_argument(
+        "--exclude-pattern",
+        help="exclude files and directories matching this glob pattern",
     )
     parser.add_argument("--delete-original", action="store_true", help="Delete the original file after copying it")
     parser.add_argument("--log-level",
@@ -181,7 +200,14 @@ Example: ./photo_sort.sh /media/akira/QNAPTS230/UploadedPictures /media/akira/QN
         raise SystemExit("source must be directory")
     tz = ZoneInfo(args.timezone)
     dst.mkdir(parents=True, exist_ok=True)
-    process(src, dst, tz, args.dry_run, args.delete_original)
+    process(
+        src,
+        dst,
+        tz,
+        args.dry_run,
+        args.delete_original,
+        args.exclude_pattern,
+    )
 
 
 if __name__ == "__main__":
