@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 from datetime import datetime
@@ -8,6 +9,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 import logging
 import sys
+from typing import List
 
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -109,15 +111,29 @@ def sha256_file(path: Path, chunk=1024 * 1024):
     return h.hexdigest()
 
 
-def collect_files(src: Path):
-    for p in src.rglob("*"):
-        if p.is_file() and p.suffix.lower() in ALL_EXT:
-            yield p
+def collect_files(src: Path) -> list[Path]:
+    _logger.info(f"Start collecting files under {src}")
+    fs: list[Path] = []
+    stack = [os.fspath(src)]
+    while stack:
+        directory = stack.pop()
+        with os.scandir(directory) as entries:
+            _logger.info(f"Scanning {directory}")
+            for entry in entries:
+                if entry.is_dir(follow_symlinks=False):
+                    stack.append(entry.path)
+                    continue
+                ext = os.path.splitext(entry.name)[1].lower()
+                if ext in ALL_EXT and entry.is_file(follow_symlinks=False):
+                    fs.append(Path(entry.path))
+    _logger.info(f"End collecting files under {src}")
+    return fs
 
 
 def process(src_dir: Path, dst_dir: Path, tz, dry_run=False, delete_original=False):
     seen_hashes = set()
-    for path in collect_files(src_dir):
+    ps = collect_files(src_dir)
+    for path in ps:
         h = sha256_file(path)
         dt = get_capture_time(path)
         ts = format_timestamp(dt, tz)
