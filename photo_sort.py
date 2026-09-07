@@ -137,7 +137,10 @@ def process(src_dir: Path, dst_dir: Path, tz, dry_run=False, delete_original=Fal
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Copy photos/videos and rename by capture time"
+            description="""
+Copy photos/videos and rename by capture time.
+Example: ./photo_sort.sh /media/akira/QNAPTS230/UploadedPictures /media/akira/QNAPTS230/Pictures""",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("source", type=Path, help="source directory")
     parser.add_argument("destination", type=Path, help="destination directory")
