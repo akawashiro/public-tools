@@ -5,7 +5,8 @@ import json
 import os
 import shutil
 import subprocess
-from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 import logging
@@ -99,6 +100,17 @@ def format_timestamp(dt: datetime, tz):
     return dt.strftime("%Y-%m-%dT%H-%M-%S%z")
 
 
+def parse_date(value: str) -> date:
+    try:
+        if len(value) != 10 or value[4] != "-" or value[7] != "-":
+            raise ValueError
+        return date.fromisoformat(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(
+            f"invalid date: {value!r} (expected YYYY-MM-DD)"
+        ) from error
+
+
 def sha256_file(path: Path, chunk=1024 * 1024):
     h = hashlib.sha256()
 
@@ -138,6 +150,34 @@ def collect_files(src: Path, exclude_pattern: str | None = None) -> list[Path]:
     return fs
 
 
+def prepare_file(
+    path: Path,
+    dst_dir: Path,
+    tz,
+    since: date | None = None,
+) -> tuple[Path, Path, str] | None:
+    _logger.info(f"Processing {path}")
+    dt = get_capture_time(path)
+    local_dt = dt.replace(tzinfo=tz) if dt.tzinfo is None else dt.astimezone(tz)
+    if since is not None and local_dt.date() < since:
+        _logger.info(f"SKIP before {since.isoformat()}: {path}")
+        return None
+
+    h = sha256_file(path)
+    ts = format_timestamp(dt, tz)
+    new_name = ts + "-" + h[:8] + path.suffix.lower()
+    dst = dst_dir / new_name
+    _logger.info(f"{path} -> {dst}")
+    return path, dst, h
+
+
+def copy_file(operation: tuple[Path, Path, str], delete_original: bool):
+    path, dst, _ = operation
+    shutil.copy(path, dst)
+    if delete_original:
+        path.unlink()
+
+
 def process(
     src_dir: Path,
     dst_dir: Path,
@@ -145,25 +185,35 @@ def process(
     dry_run=False,
     delete_original=False,
     exclude_pattern: str | None = None,
+    workers: int = 64,
+    since: date | None = None,
 ):
     seen_hashes = set()
     ps = collect_files(src_dir, exclude_pattern)
-    for path in ps:
-        h = sha256_file(path)
-        dt = get_capture_time(path)
-        ts = format_timestamp(dt, tz)
-        new_name = ts + "-" + h[:8] + path.suffix.lower()
-        dst = dst_dir / new_name
-        _logger.info(f"{path} -> {dst}")
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        operations = executor.map(
+            lambda path: prepare_file(path, dst_dir, tz, since),
+            ps,
+        )
 
-        if not dry_run:
+        unique_operations = []
+        for operation in operations:
+            if operation is None:
+                continue
+            path, _, h = operation
             if h in seen_hashes:
                 _logger.warning(f"SKIP duplicate {path}")
                 continue
-            shutil.copy(path, dst)
-        if delete_original:
-            shutil.rmtree(path)
-        seen_hashes.add(h)
+            seen_hashes.add(h)
+            unique_operations.append(operation)
+
+        if not dry_run:
+            list(
+                executor.map(
+                    lambda operation: copy_file(operation, delete_original),
+                    unique_operations,
+                )
+            )
 
 
 def main():
@@ -186,6 +236,18 @@ Example: ./photo_sort.sh --exclude-pattern "@Recently-Snapshot" /media/akira/QNA
         help="exclude files and directories matching this glob pattern",
     )
     parser.add_argument("--delete-original", action="store_true", help="Delete the original file after copying it")
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=64,
+        help="number of parallel workers (default: 64)",
+    )
+    parser.add_argument(
+        "--since",
+        type=parse_date,
+        metavar="YYYY-MM-DD",
+        help="process files captured on or after this date",
+    )
     parser.add_argument("--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
@@ -196,6 +258,8 @@ Example: ./photo_sort.sh --exclude-pattern "@Recently-Snapshot" /media/akira/QNA
     dst = args.destination
 
     setup_logging(args.log_level)
+    if args.workers < 1:
+        parser.error("--workers must be at least 1")
     if not src.is_dir():
         raise SystemExit("source must be directory")
     tz = ZoneInfo(args.timezone)
@@ -207,6 +271,8 @@ Example: ./photo_sort.sh --exclude-pattern "@Recently-Snapshot" /media/akira/QNA
         args.dry_run,
         args.delete_original,
         args.exclude_pattern,
+        args.workers,
+        args.since,
     )
 
 
