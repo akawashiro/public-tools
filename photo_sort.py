@@ -173,7 +173,7 @@ def prepare_file(
 
 def copy_file(operation: tuple[Path, Path, str], delete_original: bool):
     path, dst, _ = operation
-    shutil.copy(path, dst)
+    shutil.copyfile(path, dst)
     if delete_original:
         path.unlink()
 
