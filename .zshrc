@@ -17,8 +17,8 @@ export PATH="$GOPATH/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 zshrc_dir="${${(%):-%N}:A:h}"
-if [ -f "$zshrc_dir/fine_grained_pat_of_github_for_gh_command" ]; then
-  source "$zshrc_dir/fine_grained_pat_of_github_for_gh_command"
+if [ -f "$zshrc_dir/secret_tokens" ]; then
+  source "$zshrc_dir/secret_tokens"
 fi
 
 if [ -d /mnt/pvc-home/akirakawata/ ]; then
