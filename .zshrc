@@ -16,15 +16,18 @@ export PATH="$GOPATH/bin:$PATH"
 
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+########## Load machine specific settings start ##########
+
 zshrc_dir="${${(%):-%N}:A:h}"
 if [ -f "$zshrc_dir/secret_tokens" ]; then
   source "$zshrc_dir/secret_tokens"
 fi
 
-if [ -d /mnt/pvc-home/akirakawata/ ]; then
-    mkdir -p /mnt/pvc-home/akirakawata/.codex
-    export CODEX_HOME="/mnt/pvc-home/akirakawata/.codex"
+if [ -f $zshrc_dir/machine_specific.zsh ]; then
+  source $zshrc_dir/machine_specific.zsh
 fi
+
+########## Load machine specific settings end ##########
 
 ########### google-cloud-sdk start ##########
 if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
@@ -434,12 +437,6 @@ viewonnx() {
 }
 
 ########## viewonnx end ##########
-
-########## Load machine specific settings start ##########
-
-[ -f ~/.machine_specific.zsh ] && source ~/.machine_specific.zsh
-
-########## Load machine specific settings end ##########
 
 ########## Remove duplicated entry from PATH start ###########
 

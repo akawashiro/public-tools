@@ -20,3 +20,5 @@ renlog_view_last_cmd() {
 }
 
 bind -x '"\e1":renlog_view_last_cmd'
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
