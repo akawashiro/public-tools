@@ -1,0 +1,77 @@
+{
+  "name": "julia-workbench",
+  "displayName": "Julia Workbench",
+  "description": "An independent Julia language server with static navigation and diagnostics.",
+  "version": "0.1.0",
+  "publisher": "julia-workbench",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0",
+    "node": ">=20"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./dist/extension.js",
+  "bin": {
+    "julia-workbench": "./dist/server.js"
+  },
+  "scripts": {
+    "build": "tsc && node scripts/assets.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "package": "npm run build && vsce package --allow-missing-repository",
+    "vscode:prepublish": "npm run build"
+  },
+  "activationEvents": [
+    "onLanguage:julia"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
+  "contributes": {
+    "grammars": [
+      {
+        "language": "julia",
+        "scopeName": "source.julia",
+        "path": "./syntaxes/julia.tmLanguage.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "julia",
+        "aliases": [
+          "Julia"
+        ],
+        "extensions": [
+          ".jl"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "juliaWorkbench.restart",
+        "title": "Julia Workbench: Restart Language Server"
+      }
+    ]
+  },
+  "dependencies": {
+    "smol-toml": "^1.9.1",
+    "vscode-languageclient": "9.0.1",
+    "vscode-languageserver": "9.0.1",
+    "vscode-languageserver-textdocument": "1.0.12",
+    "web-tree-sitter": "0.24.7"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^4.1.0",
+    "tree-sitter-julia": "^0.23.1",
+    "typescript": "^5.7.0"
+  }
+}

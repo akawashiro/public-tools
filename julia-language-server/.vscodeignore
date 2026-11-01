@@ -1,0 +1,10 @@
+src/**
+test/**
+scripts/**
+node_modules/tree-sitter-julia/**
+node_modules/typescript/**
+node_modules/@types/**
+node_modules/@vscode/**
+tsconfig.json
+**/*.map
+.vscode/**
