@@ -1,0 +1,17 @@
+[package]
+name = "rust-vattention"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "CUDA Llama inference with virtually contiguous, dynamically mapped KV caches"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+rand = "0.8"
+rayon = "1"
+cudarc = { version = "0.19.10", default-features = false, features = ["std", "driver", "nvrtc", "dynamic-loading", "cuda-12060"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
