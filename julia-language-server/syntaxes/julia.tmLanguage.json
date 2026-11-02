@@ -1,0 +1,19 @@
+{
+  "scopeName": "source.julia",
+  "name": "Julia",
+  "patterns": [
+    { "include": "#block-comment" },
+    { "name": "comment.line.number-sign.julia", "match": "#.*$" },
+    { "name": "string.quoted.triple.julia", "begin": "\"\"\"", "end": "\"\"\"", "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.julia" }] },
+    { "name": "string.quoted.double.julia", "begin": "\"", "end": "\"", "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.julia" }] },
+    { "name": "string.quoted.single.julia", "match": "'(?:[^'\\\\]|\\\\.)'" },
+    { "name": "string.quoted.other.julia", "begin": "`", "end": "`", "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.julia" }] },
+    { "name": "entity.name.function.macro.julia", "match": "@[\\p{L}_][\\p{L}\\p{N}_!]*" },
+    { "name": "keyword.control.julia", "match": "\\b(?:abstract|baremodule|begin|break|catch|const|continue|do|else|elseif|end|export|finally|for|function|global|if|import|in|isa|let|local|macro|module|mutable|primitive|public|quote|return|struct|try|type|using|where|while)\\b" },
+    { "name": "constant.language.julia", "match": "\\b(?:true|false|nothing|missing|Inf|NaN)\\b" },
+    { "name": "constant.numeric.julia", "match": "\\b(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|[0-9][0-9_]*(?:\\.[0-9_]*)?(?:[eEf][+-]?[0-9_]+)?)\\b" },
+    { "name": "support.type.julia", "match": "\\b(?:Int(?:8|16|32|64|128)?|UInt(?:8|16|32|64|128)?|Float(?:16|32|64)|Bool|String|Char|Symbol|Vector|Matrix|Array|Dict|Set|Tuple|Nothing|Missing|Any|Number|Real|Integer|AbstractArray|AbstractString)\\b" },
+    { "name": "keyword.operator.julia", "match": "[+*/^%=<>!&|~:−÷×]+" }
+  ],
+  "repository": { "block-comment": { "name": "comment.block.julia", "begin": "#=", "end": "=#", "patterns": [{ "include": "#block-comment" }] } }
+}

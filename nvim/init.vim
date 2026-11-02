@@ -92,25 +92,16 @@ set completeopt=menuone
 " Search selected words with * even if in visual mode
 vnoremap <silent> * "vy/\V<C-r>=substitute(escape(@v,'\/'),"\n",'\\n','g')<CR><CR>
 
+" Copy the full path of the current file
+command! CopyFullPath let @+=expand('%:p')
+
 " ========== nvim end ==========
-
-" ========== deoplete start ==========
-
-let g:deoplete#enable_at_startup = 1
-
-" ========== deoplete end ==========
 
 " ========== julia start ==========
 
 autocmd BufNewFile,BufRead *.jl setfiletype julia
 
 " ========== julia end ==========
-
-" ========== rhubarb.vim start ===========
-
-let g:github_enterprise_urls = ['https://github.pfidev.jp']
-
-" ========== rhubarb.vim end ===========
 
 " ========== fzf start ===========
 
@@ -195,8 +186,8 @@ command! -bang -nargs=* TmuxGitGrepWholeRepo
     \     'tmux': '-p95%'}),
     \   <bang>0)
 
-noremap <Leader>fgf  :TmuxGitFilesUnderCurrentDir<CR>
-noremap <Leader>fgwf :TmuxGitFilesWholeRepo<CR>
+" noremap <Leader>fgf  :TmuxGitFilesUnderCurrentDir<CR>
+noremap <Leader>fgf :TmuxGitFilesWholeRepo<CR>
 noremap <Leader>fgg  :TmuxGitGrepUnderCurrentDir<CR>
 noremap <Leader>fgwg :TmuxGitGrepWholeRepo<CR>
 noremap <Leader>fgc  :TmuxGitGrepCurrentWordUnderCurrentDir<CR>
@@ -319,6 +310,7 @@ let g:coc_global_extensions = [
     \'coc-pyright',
     \'coc-prettier',
     \'coc-rust-analyzer',
+    \'coc-tsserver',
     \]
 
 " Color of Error and Warning

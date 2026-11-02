@@ -1,0 +1,32 @@
+const vscode = require('vscode');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+
+exports.run = async function () {
+  const extension = vscode.extensions.getExtension('julia-workbench.julia-workbench');
+  assert(extension, 'extension is registered');
+  await extension.activate();
+  const uri = vscode.Uri.file(path.join(__dirname, '../examples/demo.jl'));
+  const document = await vscode.workspace.openTextDocument(uri);
+  await vscode.window.showTextDocument(document);
+  assert.equal(document.languageId, 'julia');
+  const defs = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, new vscode.Position(13, 10));
+  assert.equal(defs.length, 1);
+  assert.equal((defs[0].range ?? defs[0].targetSelectionRange).start.line, 5);
+  const hover = await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, new vscode.Position(13, 10));
+  assert(hover.some(h => h.contents.some(c => /Return a greeting/.test(c.value))));
+  const completions = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', uri, new vscode.Position(13, 10));
+  assert(completions.items.some(i => i.label === 'greet'));
+  const rename = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider', uri, new vscode.Position(5, 16), 'person');
+  assert.equal(rename.size, 1);
+  assert.equal(rename.get(uri).length, 2);
+  const scratch = await vscode.workspace.openTextDocument({ language: 'julia', content: 'function broken(\n' });
+  await vscode.window.showTextDocument(scratch);
+  const deadline = Date.now() + 5000;
+  while (!vscode.languages.getDiagnostics(scratch.uri).length && Date.now() < deadline) await new Promise(r => setTimeout(r, 50));
+  assert(vscode.languages.getDiagnostics(scratch.uri).some(d => d.severity === vscode.DiagnosticSeverity.Error));
+  await vscode.commands.executeCommand('juliaWorkbench.restart');
+  const afterRestart = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, new vscode.Position(13, 10));
+  assert.equal(afterRestart.length, 1);
+  console.log('Julia Workbench VSCode integration passed: activation, definition, hover, completion, rename, diagnostics, restart.');
+};
