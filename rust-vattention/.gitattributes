@@ -1,0 +1,2 @@
+# Preserve benchmark tool output, including padded columns and CR progress.
+benchmarks/**/*.log -whitespace

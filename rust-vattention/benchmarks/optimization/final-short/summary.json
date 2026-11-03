@@ -1,0 +1,89 @@
+{
+  "environment": {
+    "date": "2026-11-03T09:41:31+0900",
+    "input_len": 128,
+    "output_len": 64,
+    "num_prompts": 10,
+    "repeats": 3,
+    "concurrency": 1,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 42,
+    "context_length": 512,
+    "vllm_kv_cache_mib": 256,
+    "gpu": "NVIDIA GeForce RTX 5060 Ti, 580.178.04, 16311 MiB",
+    "versions": "0.33.0 2.14.0+cu130 5.20.2"
+  },
+  "models": {
+    "Qwen3-0.6B": {
+      "rust": {
+        "output_throughput": 259.9061741825851,
+        "mean_ttft_ms": 8.303548581898212,
+        "mean_tpot_ms": 3.7734314603435375,
+        "mean_e2el_ms": 246.0927214822732,
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "peak_gpu_mib": 1438,
+        "binary_sha256": "308401d4c49c3c4b71003ed016cf6efed48584e043c194a7073fbde40f681233"
+      },
+      "vllm": {
+        "output_throughput": 266.5479835123482,
+        "mean_ttft_ms": 12.599531898740679,
+        "mean_tpot_ms": 3.606676220864294,
+        "mean_e2el_ms": 239.8201338131912,
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "peak_gpu_mib": 1816,
+        "binary_sha256": null
+      },
+      "rust_over_vllm_throughput": 0.975082125018382,
+      "identical_continuations": 30,
+      "compared_continuations": 30
+    },
+    "Qwen3-1.7B": {
+      "rust": {
+        "output_throughput": 107.22066172678542,
+        "mean_ttft_ms": 15.099165996070951,
+        "mean_tpot_ms": 9.233246780451505,
+        "mean_e2el_ms": 596.7300669988617,
+        "revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+        "peak_gpu_mib": 3588,
+        "binary_sha256": "308401d4c49c3c4b71003ed016cf6efed48584e043c194a7073fbde40f681233"
+      },
+      "vllm": {
+        "output_throughput": 111.20768343755162,
+        "mean_ttft_ms": 15.695996792055668,
+        "mean_tpot_ms": 8.88095222383974,
+        "mean_e2el_ms": 575.1813445938751,
+        "revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+        "peak_gpu_mib": 4266,
+        "binary_sha256": null
+      },
+      "rust_over_vllm_throughput": 0.9641479654325764,
+      "identical_continuations": 30,
+      "compared_continuations": 30
+    },
+    "Qwen3-4B-Instruct-2507": {
+      "rust": {
+        "output_throughput": 48.04494483155271,
+        "mean_ttft_ms": 32.89972197962925,
+        "mean_tpot_ms": 20.61835417601591,
+        "mean_e2el_ms": 1331.872572901193,
+        "revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+        "peak_gpu_mib": 8026,
+        "binary_sha256": "308401d4c49c3c4b71003ed016cf6efed48584e043c194a7073fbde40f681233"
+      },
+      "vllm": {
+        "output_throughput": 48.03307750418249,
+        "mean_ttft_ms": 30.53381369682029,
+        "mean_tpot_ms": 20.661172519127533,
+        "mean_e2el_ms": 1332.1187398047186,
+        "revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+        "peak_gpu_mib": 8986,
+        "binary_sha256": null
+      },
+      "rust_over_vllm_throughput": 1.0002470657302605,
+      "identical_continuations": 27,
+      "compared_continuations": 30
+    }
+  },
+  "measured_requests": 180
+}

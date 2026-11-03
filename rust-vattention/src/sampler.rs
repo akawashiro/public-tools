@@ -2,6 +2,7 @@ use crate::softmax;
 use anyhow::{ensure, Result};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
+#[derive(Clone)]
 pub struct Sampler {
     temperature: f32,
     top_p: f32,
@@ -23,6 +24,18 @@ impl Sampler {
             top_p,
             rng: StdRng::seed_from_u64(seed),
         })
+    }
+
+    pub(crate) fn gpu_draw(&mut self) -> Option<(f32, f32, f32)> {
+        if self.is_greedy() {
+            None
+        } else {
+            Some((self.temperature, self.top_p, self.rng.gen::<f32>()))
+        }
+    }
+
+    pub fn is_greedy(&self) -> bool {
+        self.temperature == 0.
     }
 
     pub fn sample(&mut self, logits: &[f32]) -> Result<usize> {

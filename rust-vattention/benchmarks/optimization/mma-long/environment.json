@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-03T09:27:38+0900",
+  "input_len": 2048,
+  "output_len": 64,
+  "num_prompts": 3,
+  "repeats": 1,
+  "concurrency": 1,
+  "temperature": 0.0,
+  "top_p": 1.0,
+  "seed": 42,
+  "context_length": 4096,
+  "vllm_kv_cache_mib": 1024,
+  "gpu": "NVIDIA GeForce RTX 5060 Ti, 580.178.04, 16311 MiB",
+  "versions": "0.33.0 2.14.0+cu130 5.20.2"
+}

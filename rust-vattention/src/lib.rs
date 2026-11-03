@@ -1,5 +1,6 @@
-//! CPU Llama inference. Checkpoints use the legacy llama2.c FP32 format.
+//! CPU/CUDA Llama and Qwen3 inference with Hugging Face safetensors or llama2.c checkpoints.
 pub mod cuda;
+pub mod hub;
 pub mod model;
 pub mod sampler;
 pub mod tokenizer;
@@ -38,3 +39,6 @@ pub(crate) fn product(values: &[usize]) -> Result<usize> {
     );
     Ok(result)
 }
+
+pub mod server;
+pub mod text;

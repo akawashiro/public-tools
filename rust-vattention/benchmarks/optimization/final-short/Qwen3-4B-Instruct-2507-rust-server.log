@@ -1,0 +1,5 @@
+loading model-00001-of-00003.safetensors
+loading model-00002-of-00003.safetensors
+loading model-00003-of-00003.safetensors
+CUDA device: NVIDIA GeForce RTX 5060 Ti; KV cache initially maps 0 physical bytes
+OpenAI-compatible API: http://127.0.0.1:8100/v1 (requests execute sequentially)

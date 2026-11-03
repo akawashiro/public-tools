@@ -9,9 +9,12 @@ pub struct Config {
     pub hidden_dim: usize,
     pub layers: usize,
     pub heads: usize,
+    pub head_dim: usize,
     pub kv_heads: usize,
     pub vocab_size: usize,
     pub context: usize,
+    pub rms_norm_eps: f32,
+    pub rope_theta: f32,
 }
 
 #[derive(Clone)]
@@ -28,6 +31,8 @@ pub(crate) struct Layout {
     pub(crate) gate: Range<usize>,
     pub(crate) norm: Range<usize>,
     pub(crate) classifier: Range<usize>,
+    pub(crate) q_norm: Option<Range<usize>>,
+    pub(crate) k_norm: Option<Range<usize>>,
 }
 
 /// Weights are immutable; each session owns its KV cache and activation buffers.
@@ -74,9 +79,12 @@ impl Model {
             hidden_dim,
             layers,
             heads,
+            head_dim: dim / heads,
             kv_heads,
             vocab_size,
             context,
+            rms_norm_eps: 1e-5,
+            rope_theta: 10000.,
         };
         let kv = product(&[dim / heads, kv_heads])?;
         product(&[layers, context, kv])?;
@@ -139,8 +147,21 @@ impl Model {
                 gate,
                 norm,
                 classifier,
+                q_norm: None,
+                k_norm: None,
             },
         })
+    }
+
+    /// Restrict the allocated context without changing positional encoding.
+    pub fn limit_context(&mut self, context: usize) -> Result<()> {
+        ensure!(
+            context > 0 && context <= self.config.context,
+            "context length must be in 1..={}",
+            self.config.context
+        );
+        self.config.context = context;
+        Ok(())
     }
 
     pub fn config(&self) -> &Config {
@@ -178,16 +199,16 @@ fn zeros(n: usize) -> Result<Vec<f32>> {
 impl<'a> Session<'a> {
     fn new(model: &'a Model) -> Result<Self> {
         let c = &model.config;
-        let cache = product(&[c.layers, c.context, c.dim / c.heads, c.kv_heads])?;
+        let cache = product(&[c.layers, c.context, c.head_dim, c.kv_heads])?;
         Ok(Self {
             model,
             position: 0,
             keys: zeros(cache)?,
             values: zeros(cache)?,
             x: zeros(c.dim)?,
-            xb: zeros(c.dim)?,
+            xb: zeros(c.dim.max(c.heads * c.head_dim))?,
             residual: zeros(c.dim)?,
-            q: zeros(c.dim)?,
+            q: zeros(c.heads * c.head_dim)?,
             hidden: zeros(c.hidden_dim)?,
             gate: zeros(c.hidden_dim)?,
             scores: zeros(c.context)?,
@@ -215,7 +236,8 @@ impl<'a> Session<'a> {
         );
         let pos = self.position;
         let d = c.dim;
-        let head = d / c.heads;
+        let head = c.head_dim;
+        let qdim = c.heads * head;
         let kv = head * c.kv_heads;
         let w = &self.model.weights;
         let l = &self.model.layout;
@@ -227,26 +249,46 @@ impl<'a> Session<'a> {
                 &mut self.xb,
                 &self.x,
                 &w[l.att_norm.start + layer * d..][..d],
+                c.rms_norm_eps,
             );
             let cache = layer * c.context * kv;
             let current = cache + pos * kv;
             matvec(
                 &mut self.q,
-                &self.xb,
-                &w[l.q.start + layer * d * d..][..d * d],
+                &self.xb[..d],
+                &w[l.q.start + layer * qdim * d..][..qdim * d],
             );
             matvec(
                 &mut self.keys[current..current + kv],
-                &self.xb,
+                &self.xb[..d],
                 &w[l.k.start + layer * kv * d..][..kv * d],
             );
             matvec(
                 &mut self.values[current..current + kv],
-                &self.xb,
+                &self.xb[..d],
                 &w[l.v.start + layer * kv * d..][..kv * d],
             );
-            rope(&mut self.q, head, pos);
-            rope(&mut self.keys[current..current + kv], head, pos);
+            if let (Some(qn), Some(kn)) = (&l.q_norm, &l.k_norm) {
+                head_norm(
+                    &mut self.q,
+                    head,
+                    &w[qn.start + layer * head..][..head],
+                    c.rms_norm_eps,
+                );
+                head_norm(
+                    &mut self.keys[current..current + kv],
+                    head,
+                    &w[kn.start + layer * head..][..head],
+                    c.rms_norm_eps,
+                );
+            }
+            rope(&mut self.q, head, pos, c.rope_theta);
+            rope(
+                &mut self.keys[current..current + kv],
+                head,
+                pos,
+                c.rope_theta,
+            );
             self.xb.fill(0.);
             for h in 0..c.heads {
                 let kh = h / (c.heads / c.kv_heads) * head;
@@ -265,8 +307,8 @@ impl<'a> Session<'a> {
             }
             matvec(
                 &mut self.residual,
-                &self.xb,
-                &w[l.o.start + layer * d * d..][..d * d],
+                &self.xb[..qdim],
+                &w[l.o.start + layer * d * qdim..][..d * qdim],
             );
             for (x, r) in self.x.iter_mut().zip(&self.residual) {
                 *x += r;
@@ -275,16 +317,17 @@ impl<'a> Session<'a> {
                 &mut self.xb,
                 &self.x,
                 &w[l.ffn_norm.start + layer * d..][..d],
+                c.rms_norm_eps,
             );
             let f = d * c.hidden_dim;
             matvec(
                 &mut self.hidden,
-                &self.xb,
+                &self.xb[..d],
                 &w[l.up.start + layer * f..][..f],
             );
             matvec(
                 &mut self.gate,
-                &self.xb,
+                &self.xb[..d],
                 &w[l.gate.start + layer * f..][..f],
             );
             for (h, g) in self.hidden.iter_mut().zip(&self.gate) {
@@ -299,14 +342,23 @@ impl<'a> Session<'a> {
                 *x += r;
             }
         }
-        rmsnorm(&mut self.xb, &self.x, &w[l.norm.clone()]);
-        matvec(&mut self.logits, &self.xb, &w[l.classifier.clone()]);
+        rmsnorm(&mut self.xb, &self.x, &w[l.norm.clone()], c.rms_norm_eps);
+        matvec(&mut self.logits, &self.xb[..d], &w[l.classifier.clone()]);
         ensure!(
             self.logits.iter().all(|v| v.is_finite()),
             "non-finite logits; reset the session before retrying"
         );
         self.position += 1;
         Ok(&self.logits)
+    }
+}
+
+fn head_norm(x: &mut [f32], head: usize, weights: &[f32], eps: f32) {
+    for part in x.chunks_exact_mut(head) {
+        let scale = (dot(part, part) / head as f32 + eps).sqrt().recip();
+        for (v, w) in part.iter_mut().zip(weights) {
+            *v *= scale * w;
+        }
     }
 }
 
@@ -320,8 +372,8 @@ fn matvec(out: &mut [f32], input: &[f32], matrix: &[f32]) {
         .for_each(|(out, row)| *out = dot(row, input));
 }
 
-fn rmsnorm(out: &mut [f32], input: &[f32], weights: &[f32]) {
-    let scale = (dot(input, input) / input.len() as f32 + 1e-5)
+fn rmsnorm(out: &mut [f32], input: &[f32], weights: &[f32], eps: f32) {
+    let scale = (dot(input, input) / input.len() as f32 + eps)
         .sqrt()
         .recip();
     for ((o, x), w) in out.iter_mut().zip(input).zip(weights) {
@@ -329,9 +381,9 @@ fn rmsnorm(out: &mut [f32], input: &[f32], weights: &[f32]) {
     }
 }
 
-fn rope(vector: &mut [f32], head: usize, position: usize) {
+fn rope(vector: &mut [f32], head: usize, position: usize, theta: f32) {
     for (i, pair) in vector.as_chunks_mut::<2>().0.iter_mut().enumerate() {
-        let angle = position as f32 / 10000f32.powf((i * 2 % head) as f32 / head as f32);
+        let angle = position as f32 / theta.powf((i * 2 % head) as f32 / head as f32);
         let (sin, cos) = angle.sin_cos();
         let (a, b) = (pair[0], pair[1]);
         pair[0] = a * cos - b * sin;
@@ -356,7 +408,7 @@ mod tests {
     fn rope_preserves_norm() {
         let mut v = vec![1., 2., 3., 4., 5., 6., 7., 8.];
         let before = dot(&v, &v);
-        rope(&mut v, 4, 7);
+        rope(&mut v, 4, 7, 10000.);
         assert!((dot(&v, &v) - before).abs() < 1e-4);
     }
 }

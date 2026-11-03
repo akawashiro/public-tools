@@ -1,0 +1,46 @@
+W1103 09:34:47.997000 1172559 torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1103 09:34:47.998000 1172559 torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1103 09:34:47.998000 1172559 torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+Namespace(subparser='bench', bench_type='serve', dispatch_function=<function BenchmarkServingSubcommand.cmd at 0x7e15bc87d010>, trust_remote_code=False, seed=42, num_prompts=10, dataset_name='random', no_stream=False, dataset_path=None, no_oversample=False, skip_chat_template=False, enable_multimodal_chat=False, disable_shuffle=False, custom_output_len=256, custom_ensure_client_side_data=False, spec_bench_output_len=256, spec_bench_category=None, sharegpt_output_len=None, timed_trace_chunk_hash_size=16, timed_trace_sec_multiplier=1, timed_trace_label_timestamp='timestamp', timed_trace_label_input_length='input_length', timed_trace_label_output_length='output_length', timed_trace_label_hash_ids='hash_ids', blazedit_min_distance=0.0, blazedit_max_distance=1.0, asr_max_audio_len_sec=inf, asr_min_audio_len_sec=0.0, random_input_len=128, random_output_len=64, random_range_ratio='0', random_prefix_len=0, random_batch_size=1, no_reranker=False, random_mm_base_items_per_request=1, random_mm_num_mm_items_range_ratio=0.0, random_mm_limit_mm_per_prompt={'image': 255, 'video': 1}, random_mm_bucket_config={(256, 256, 1): 0.5, (720, 1280, 1): 0.5, (720, 1280, 16): 0.0}, hf_subset=None, hf_split=None, hf_name=None, hf_output_len=None, bfcl_categories=None, prefix_repetition_prefix_len=256, prefix_repetition_suffix_len=256, prefix_repetition_num_prefixes=10, prefix_repetition_output_len=128, speed_bench_dataset_subset='qualitative', speed_bench_output_len=4096, speed_bench_category=None, label=None, backend='openai', base_url='http://127.0.0.1:8100', host='127.0.0.1', port=8000, endpoint='/v1/completions', header=None, max_concurrency=1, model='/home/akira/public-tools/rust-vattention/models/hub/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca', input_len=None, output_len=None, tokenizer='/home/akira/public-tools/rust-vattention/models/hub/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca', tokenizer_mode='auto', use_beam_search=False, logprobs=None, request_rate=inf, burstiness=1.0, probe_request_rate=0.0, disable_tqdm=False, num_warmups=2, profile=False, save_result=True, save_detailed=True, append_result=False, metadata=None, result_dir='benchmarks/optimization/final-short', result_filename='Qwen3-0.6B-rust-2.json', ignore_eos=True, self_timed=None, percentile_metrics='ttft,tpot,itl,e2el', metric_percentiles='99', goodput=None, request_id_prefix='bench-8dcdd6a2-', top_p=1.0, top_k=None, min_p=None, temperature=0.0, frequency_penalty=None, presence_penalty=None, repetition_penalty=None, served_model_name='/home/akira/public-tools/rust-vattention/models/hub/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca', lora_modules=None, lora_assignment='random', ramp_up_strategy=None, ramp_up_start_rps=None, ramp_up_end_rps=None, ready_check_timeout_sec=0, chat_template_kwargs=None, extra_body=None, skip_tokenizer_init=False, insecure=False, plot_timeline=False, timeline_itl_thresholds='25,50', plot_dataset_stats=False, log_config_file=None, logging_config=LoggingConfig(log_level='INFO', formatter='text', configure_logging=True, pylogging_config_file=None))
+(MainProcess pid=1172559) INFO 11-03 09:34:50 [utils.py:88] Sampling input_len from [128, 128] and output_len from [64, 64]
+WARNING: /tokenize unavailable (404 Not Found: either this server has no /tokenize route, or it does not serve a model named `/home/akira/public-tools/rust-vattention/models/hub/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca` (its served names are listed by GET /v1/models)), skipping alignment.
+Starting initial single prompt test run...
+Skipping endpoint ready check.
+Warming up with 2 requests...
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:00<00:00,  4.04it/s]100%|██████████| 2/2 [00:00<00:00,  4.05it/s]100%|██████████| 2/2 [00:00<00:00,  4.05it/s]
+Warmup run completed.
+Starting main benchmark run...
+Traffic request rate: inf
+Burstiness factor: 1.0 (Poisson process)
+Maximum request concurrency: 1
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:00<00:02,  4.06it/s] 20%|██        | 2/10 [00:00<00:01,  4.06it/s] 30%|███       | 3/10 [00:00<00:01,  4.06it/s] 40%|████      | 4/10 [00:00<00:01,  4.06it/s] 50%|█████     | 5/10 [00:01<00:01,  4.06it/s] 60%|██████    | 6/10 [00:01<00:00,  4.06it/s] 70%|███████   | 7/10 [00:01<00:00,  4.06it/s] 80%|████████  | 8/10 [00:01<00:00,  4.06it/s] 90%|█████████ | 9/10 [00:02<00:00,  4.06it/s]100%|██████████| 10/10 [00:02<00:00,  4.06it/s]100%|██████████| 10/10 [00:02<00:00,  4.06it/s]
+tip: install termplotlib and gnuplot to plot the metrics
+============ Serving Benchmark Result ============
+Successful requests:                     10        
+Failed requests:                         0         
+Maximum request concurrency:             1         
+Benchmark duration (s):                  2.47      
+Total input tokens:                      1280      
+Total generated tokens:                  640       
+Request throughput (req/s):              4.06      
+Output token throughput (tok/s):         259.58    
+Peak output token throughput (tok/s):    264.00    
+Peak concurrent requests:                5.00      
+Total token throughput (tok/s):          778.73    
+---------------Time to First Token----------------
+Mean TTFT (ms):                          8.39      
+Median TTFT (ms):                        8.36      
+P99 TTFT (ms):                           8.71      
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms):                          3.78      
+Median TPOT (ms):                        3.78      
+P99 TPOT (ms):                           3.78      
+---------------Inter-token Latency----------------
+Mean ITL (ms):                           4.12      
+Median ITL (ms):                         3.78      
+P99 ITL (ms):                            4.14      
+----------------End-to-end Latency----------------
+Mean E2EL (ms):                          246.40    
+Median E2EL (ms):                        246.40    
+P99 E2EL (ms):                           246.54    
+==================================================

@@ -25,7 +25,7 @@ pub(crate) struct VmmBuffer {
     pub(crate) reserved: usize,
     pub(crate) mapped: usize,
     chunk: usize,
-    prop: sys::CUmemAllocationProp,
+    device: i32,
     mappings: Vec<Mapping>,
 }
 
@@ -77,7 +77,7 @@ impl VmmBuffer {
             reserved,
             mapped: 0,
             chunk,
-            prop,
+            device: prop.location.id,
             mappings: Vec::new(),
         })
     }
@@ -86,18 +86,24 @@ impl VmmBuffer {
         ensure!(bytes <= self.reserved, "KV cache exceeds VMM reservation");
         self.ctx.bind_to_thread()?;
         let required = round_up(bytes, self.chunk)?;
+        // SAFETY: CUDA allocation properties permit zero initialization; no host
+        // pointers or platform handles are retained or moved between threads.
+        let mut prop: sys::CUmemAllocationProp = unsafe { std::mem::zeroed() };
+        prop.type_ = sys::CUmemAllocationType::CU_MEM_ALLOCATION_TYPE_PINNED;
+        prop.location.type_ = sys::CUmemLocationType::CU_MEM_LOCATION_TYPE_DEVICE;
+        prop.location.id = self.device;
         while self.mapped < required {
             let mut handle = 0;
             let address = self.address + self.mapped as u64;
             let access = sys::CUmemAccessDesc {
-                location: self.prop.location,
+                location: prop.location,
                 flags: sys::CUmemAccess_flags::CU_MEM_ACCESS_FLAGS_PROT_READWRITE,
             };
             // SAFETY: each chunk is disjoint, aligned, and inside our reservation.
             // Failed mappings release their physical handle before returning.
             unsafe {
                 check(
-                    sys::cuMemCreate(&mut handle, self.chunk, &self.prop, 0),
+                    sys::cuMemCreate(&mut handle, self.chunk, &prop, 0),
                     "cuMemCreate",
                 )?;
                 if let Err(e) = check(sys::cuMemMap(address, self.chunk, 0, handle, 0), "cuMemMap")
