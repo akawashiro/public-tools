@@ -1,5 +1,6 @@
 //! GPU transformer and vAttention-style KV allocation using CUDA Driver VMM.
 mod attention;
+mod cutile;
 mod decode;
 mod parameters;
 mod prefill;
@@ -111,6 +112,7 @@ pub struct CudaSession {
     prefill: Option<prefill::Scratch>,
     sampling: Option<sampling::Sampling>,
     attention: Option<attention::Attention>,
+    cutile_attention: Option<cutile::Attention>,
     tensor_attention: bool,
     mma_attention: bool,
     mma_limit: usize,
@@ -274,6 +276,20 @@ impl CudaSession {
             prefill: None,
             sampling: None,
             attention: None,
+            cutile_attention: if std::env::var("RUST_VATTENTION_PREFILL_ATTENTION").as_deref()
+                == Ok("cutile")
+            {
+                ensure!(
+                    fp16,
+                    "cuTile attention currently requires --weight-dtype fp16"
+                );
+                let dir = std::env::var_os("RUST_VATTENTION_CUTILE_DIR")
+                    .map(std::path::PathBuf::from)
+                    .unwrap_or_else(|| "target/cutile".into());
+                Some(cutile::Attention::load(&ctx, c, &dir)?)
+            } else {
+                None
+            },
             mma_limit: if std::env::var("RUST_VATTENTION_PREFILL_ATTENTION").as_deref() == Ok("mma")
             {
                 usize::MAX

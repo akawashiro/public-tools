@@ -1,0 +1,15 @@
+[package]
+name = "vattention-cutile-compiler"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT AND Apache-2.0"
+
+[workspace]
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+cutile = { git = "https://github.com/NVIDIA/cuda-rust.git", rev = "cced2a35bcc557b30f27209ff3887b4eb728cb63" }

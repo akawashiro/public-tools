@@ -61,6 +61,14 @@ for model in a.models:
             cmd = [str(a.venv/"bin/vllm"), "serve", str(snapshot), "--served-model-name", model, "--dtype", "half", "--max-model-len", str(a.context_length), "--max-num-seqs", "1", "--max-num-batched-tokens", str(a.context_length), "--disable-prefix-caching", "--kv-cache-memory-bytes", str(a.kv_cache_mib*1024**2), "--generation-config", "vllm", "--host", "127.0.0.1", "--port", str(a.port)]
             served_name = model
         run = {"engine":engine,"model":model,"revision":revision,"command":cmd,"baseline_gpu_mib":gpu_memory(),"benchmark_commands":[],"rust_binary_sha256":hashlib.file_digest((ROOT/"target/release/rust-vattention").open("rb"),"sha256").hexdigest(),"build_environment":{k:env[k] for k in ["CC","CXX","NVCC_PREPEND_FLAGS"] if k in env},"runtime_environment":{k:v for k,v in env.items() if k.startswith("RUST_VATTENTION_")}}
+        if engine == "rust" and env.get("RUST_VATTENTION_PREFILL_ATTENTION") == "cutile":
+            artifact_dir = Path(env.get("RUST_VATTENTION_CUTILE_DIR", ROOT/"target/cutile"))
+            run["cutile_artifacts"] = []
+            for manifest_path in sorted(artifact_dir.glob("*.json")):
+                artifact = json.loads(manifest_path.read_text())
+                cubin_path = artifact_dir/artifact["cubin"]
+                artifact["measured_cubin_sha256"] = hashlib.file_digest(cubin_path.open("rb"), "sha256").hexdigest()
+                run["cutile_artifacts"].append(artifact)
         with (a.result_dir/f"{name}-server.log").open("w") as log:
             server = subprocess.Popen(cmd, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
             stop = threading.Event()

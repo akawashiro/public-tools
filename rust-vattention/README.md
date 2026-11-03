@@ -109,6 +109,13 @@ target/bench-venv/bin/python scripts/benchmark-servers.py
 [高速化後の比較・実験記録](benchmarks/optimization/README.md) を参照してください。
 追加測定時は `--result-dir` で別の保存先を指定してください。
 
+## cuTile Rust による attention の実験
+
+長い入力向けに、Rust で書いた融合 attention を追加しています。cuTile で事前生成した cubin を
+既存の CUDA Driver API から読み込み、FP32 の VMM K/V を直接参照します。
+追加コンパイラの導入方法、精度条件、比較結果は [cuTile 実験記録](docs/cutile.md) を参照してください。
+通常ビルドは従来の CUDA 経路を使います。
+
 ## KV メモリの設計
 
 各レイヤーの K/V ごとに最大コンテキスト長に対応する連続仮想アドレス領域を `cuMemAddressReserve` で予約します。
@@ -159,7 +166,7 @@ cargo fmt --check
 # 実 GPU で VMM と CPU/CUDA の数値一致を検証
 LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
   RUST_VATTENTION_TEST_MODEL=models/stories15M.bin \
-  cargo test --release --locked -- --ignored --test-threads=1 --nocapture
+  cargo test --release --locked -- --ignored --test-threads=1 --nocapture --skip cuda::cutile::tests
 ```
 
 Hugging Face 形式の追加テストは、ランダム初期化した小さな Llama / Qwen2 / Qwen3 / Mistral と

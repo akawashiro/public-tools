@@ -1,0 +1,37 @@
+{
+  "cpu_tests": 8,
+  "gpu_tests": 13,
+  "gpu_command": "LD_LIBRARY_PATH=/usr/local/cuda/lib64 RUST_VATTENTION_TEST_MODEL=models/stories15M.bin RUST_VATTENTION_CUTILE_DIR=target/cutile-selected cargo test --locked -- --ignored --test-threads=1",
+  "direct_attention_reference": "independent dense FP64",
+  "max_observed_attention_absolute_error": 0.0005774238367233231,
+  "model_logit_absolute_tolerance": 0.0005,
+  "real_qwen3_greedy_chat_sdk_json_sse": true,
+  "setup_script_reproduced": true,
+  "short_prompt_profile": {
+    "input_tokens": 128,
+    "decode_steps": 64,
+    "prefill_ms": [
+      7.329,
+      7.34,
+      7.329
+    ],
+    "decode_ms_per_token": [
+      3.774,
+      3.774,
+      3.774
+    ]
+  },
+  "formatting_rebuild": {
+    "cubin_byte_identical": false,
+    "cuobjdump_full_sass_identical": true,
+    "sass_sha256": "c039bb902e2c3d8cd7e1ca9f87dcb9ee51afe2a213a0df56b422b97fd5048252",
+    "note": "Formatting and comment-only changes affect compiled artifact metadata; full disassembled machine instructions, encodings, and control words match."
+  },
+  "static_checks": [
+    "cargo fmt --check",
+    "cargo fmt --manifest-path kernels/cutile/Cargo.toml --check",
+    "cargo clippy --locked --all-targets -- -D warnings",
+    "CUDA_TOOLKIT_PATH=$PWD/target/cuda-toolkit-13.2 cargo clippy --release --locked --manifest-path kernels/cutile/Cargo.toml -- -D warnings",
+    "git diff --check"
+  ]
+}

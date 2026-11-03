@@ -19,7 +19,8 @@ struct Matrix {
 }
 impl CudaSession {
     pub(super) fn prepare_attention(&mut self, count: usize) -> Result<()> {
-        if (self.mma_attention && self.position + count <= self.mma_limit)
+        if self.cutile_attention.is_some()
+            || (self.mma_attention && self.position + count <= self.mma_limit)
             || !self.tensor_attention
             || count < 16
             || self.config.heads / self.config.kv_heads > 8
@@ -71,6 +72,9 @@ impl CudaSession {
         head_output: u64,
         half_output: u64,
     ) -> Result<bool> {
+        if self.position + n > 256 && n >= 16 && self.cutile_prefill(layer, n, q, half_output)? {
+            return Ok(true);
+        }
         let c = &self.config;
         let length = self.position + n;
         if self.mma_attention && length <= self.mma_limit && n >= 16 {
