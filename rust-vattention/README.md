@@ -1,6 +1,6 @@
 # rust-vattention
 
-Rust 製の CUDA Llama 推論エンジン。KV キャッシュは **vAttention 型の仮想連続メモリ**で管理します。
+Rust 製の CUDA 推論エンジン（Llama / Qwen2 / Qwen3 / Mistral）。KV キャッシュは **vAttention 型の仮想連続メモリ**で管理します。
 [vAttention のスライド](https://akawashiro.com/slides/vattention.pdf)の 18–21 ページを設計の基礎にしています。
 
 ## 実行
@@ -39,7 +39,17 @@ LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
   --prompt "The capital of France is" --temperature 0 --max-tokens 64
 ```
 
-- `model_type=llama` / `LlamaForCausalLM` と `model_type=qwen3` / `Qwen3ForCausalLM` に対応。
+| モデル系統 | `model_type` | 対応内容 |
+|---|---|---|
+| Llama 2 / 3 / 3.1 / 3.2（テキスト） | `llama` | 通常・linear・Llama 3 方式の RoPE |
+| Qwen2 / Qwen2.5（dense） | `qwen2` | Q/K/V バイアス、full attention |
+| Qwen3（dense） | `qwen3` | Q/K RMSNorm、独立した head_dim |
+| Mistral 7B v0.1 / v0.2 / v0.3 | `mistral` | full / sliding-window attention |
+
+例: `--model Qwen/Qwen2.5-0.5B-Instruct --weight-dtype fp16 --context-length 4096`。
+モデル ID の派生・fine-tune も同じ対応設定なら読み込めます。サイズによって必要な GPU メモリは異なります。
+対応範囲と検証内容は [モデル対応一覧](docs/model-support.md) を参照してください。
+
 - 必要ファイルは `config.json`、`tokenizer.json`、`model.safetensors` または
   `model.safetensors.index.json` とその分割ファイル。F32/F16/BF16 を読み込みます。
 - GQA、Qwen3 の Q/K RMSNorm、独立した `head_dim`、出力重み共有、
@@ -52,8 +62,8 @@ LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
   VMM の KV キャッシュは FP32 です。FP32 経路や vLLM と出力が完全一致する保証はありません。
   デフォルトは `fp32`。ホスト RAM 上の重みはどちらも FP32 なので十分な RAM が必要です。
 - `--context-length` は元のコンテキスト上限を縮小します。大きな既定値のモデルでは指定を推奨します。
-- 量子化、MoE、バイアス付きモデル、scaled RoPE（Llama 3.1 / YaRN など）、
-  sliding-window attention、GGUF、PyTorch pickle は未対応です。未対応の設定は読み込み時に拒否します。
+- 量子化、MoE、Qwen2 QKV 以外のバイアス、YaRN / dynamic NTK、
+  レイヤーごとに異なる sliding window、GGUF、PyTorch pickle は未対応です。未対応の設定は読み込み時に拒否します。
   Hugging Face にある任意のモデルが動くわけではありません。
 
 ## OpenAI 互換 API
@@ -152,10 +162,10 @@ LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
   cargo test --release --locked -- --ignored --test-threads=1 --nocapture
 ```
 
-Hugging Face 形式の追加テストは、ランダム初期化した小さな Llama / Qwen3 と
+Hugging Face 形式の追加テストは、ランダム初期化した小さな Llama / Qwen2 / Qwen3 / Mistral と
 Transformers の logits を比較します。F32/F16/BF16、分割、Q/K 正規化、異なる head_dim、
-不正な重み・index の拒否を検証します。`scripts/check-real-model.py` は取得済みの
-Qwen3-0.6B で Transformers との greedy 出力一致、公式 chat template、OpenAI SDK の
+QKV バイアス、拡張 RoPE、sliding window、不正な重み・index の拒否を検証します。`scripts/check-real-model.py` は取得済みの
+Qwen3-0.6B（`--model` で変更可）で Transformers との greedy 出力一致、公式 chat template、OpenAI SDK の
 通常応答とストリーミングを確認します（`target/bench-venv/bin/python` で実行）。
 
 通常テストは tokenizer の Unicode/byte fallback、BPE、サンプリング、壊れたモデルの拒否、

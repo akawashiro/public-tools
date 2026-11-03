@@ -1,4 +1,4 @@
-//! Hugging Face Llama checkpoints. Remote code and pickle weights are never loaded.
+//! Hugging Face dense decoder checkpoints. Remote code and pickle weights are never loaded.
 use crate::model::{Config, Layout, Model};
 use crate::product;
 use anyhow::{bail, ensure, Context, Result};
@@ -87,7 +87,7 @@ pub fn load(id: &str, revision: &str, cache: &Path) -> Result<HubModel> {
         |name| {
             ensure!(
                 names.contains(name),
-                "missing {name}; expected Llama safetensors (single file or indexed shards)"
+                "missing {name}; expected safetensors (single file or indexed shards)"
             );
             repo.get(name).with_context(|| format!("download {name}"))
         },
@@ -144,7 +144,12 @@ fn load_files(
         None
     };
     let shared = config["tie_word_embeddings"].as_bool().unwrap_or(false);
-    let (layout, size) = layout(&c, shared, config["model_type"] == "qwen3")?;
+    let (layout, size) = layout(
+        &c,
+        shared,
+        config["model_type"] == "qwen3",
+        config["model_type"] == "qwen2",
+    )?;
     let mut model = Model {
         config: c,
         layout,
@@ -181,7 +186,7 @@ fn load_files(
         let tensors =
             SafeTensors::deserialize(&bytes).with_context(|| format!("parse {filename}"))?;
         for (name, tensor) in tensors.tensors() {
-            if name.ends_with(".bias") {
+            if name.ends_with(".bias") && !targets.contains_key(&name) {
                 bail!("unsupported bias tensor: {name}");
             }
             if let Some(target) = targets.get(&name) {
@@ -247,18 +252,15 @@ fn token_ids(v: &Value, key: &str, vocab: usize) -> Result<Vec<usize>> {
 }
 
 fn parse_config(v: &Value) -> Result<Config> {
-    let qwen = v["model_type"] == "qwen3";
-    ensure!(
-        v["model_type"] == "llama" || qwen,
-        "unsupported model_type {:?}; supported: llama, qwen3",
-        v["model_type"]
-    );
+    let kind = v["model_type"].as_str().context("missing model_type")?;
+    let expected = match kind {
+        "llama" => "LlamaForCausalLM",
+        "qwen3" => "Qwen3ForCausalLM",
+        "qwen2" => "Qwen2ForCausalLM",
+        "mistral" => "MistralForCausalLM",
+        _ => bail!("unsupported model_type {kind:?}; supported: llama, qwen2, qwen3, mistral"),
+    };
     if let Some(architectures) = v["architectures"].as_array() {
-        let expected = if qwen {
-            "Qwen3ForCausalLM"
-        } else {
-            "LlamaForCausalLM"
-        };
         ensure!(
             architectures.iter().all(|a| a == expected),
             "unsupported architecture; expected {expected}"
@@ -269,28 +271,47 @@ fn parse_config(v: &Value) -> Result<Config> {
         "quantized models are unsupported"
     );
     ensure!(
-        v["rope_scaling"].is_null(),
-        "scaled RoPE (including Llama 3.1) is unsupported"
-    );
-    ensure!(
-        v["rope_parameters"].is_null(),
-        "rope_parameters is unsupported; expected rope_theta without scaling"
-    );
-    ensure!(
         v["hidden_act"].as_str().unwrap_or("silu") == "silu",
         "only SiLU activation is supported"
     );
-    for key in ["attention_bias", "mlp_bias", "use_qk_norm"] {
+    for key in ["mlp_bias", "use_qk_norm"] {
         ensure!(v[key].is_null() || v[key] == false, "{key} is unsupported");
     }
     ensure!(
-        v["sliding_window"].is_null(),
-        "sliding-window attention is unsupported"
+        kind == "qwen2" || v["attention_bias"].is_null() || v["attention_bias"] == false,
+        "attention_bias is only supported for Qwen2 QKV projections"
     );
     ensure!(
         v["partial_rotary_factor"].is_null() || v["partial_rotary_factor"] == 1.0,
         "partial RoPE is unsupported"
     );
+    // Qwen2.5 configs carry a window even when use_sliding_window=false.
+    // Mixed per-layer windows are not silently treated as full attention.
+    ensure!(
+        kind != "qwen2" || v["use_sliding_window"].is_null() || v["use_sliding_window"] == false,
+        "Qwen2 mixed sliding-window layers are unsupported"
+    );
+    let sliding_window = if kind == "mistral" && !v["sliding_window"].is_null() {
+        Some(dimension(v, "sliding_window")?)
+    } else {
+        ensure!(
+            kind == "qwen2" || v["sliding_window"].is_null(),
+            "sliding_window is only supported for Mistral"
+        );
+        None
+    };
+    if let Some(types) = v["layer_types"].as_array() {
+        let expected = if sliding_window.is_some() {
+            "sliding_attention"
+        } else {
+            "full_attention"
+        };
+        ensure!(
+            types.len() == dimension(v, "num_hidden_layers")?
+                && types.iter().all(|x| x == expected),
+            "mixed or unsupported layer_types"
+        );
+    }
     let dim = dimension(v, "hidden_size")?;
     let heads = dimension(v, "num_attention_heads")?;
     let kv_heads = if v["num_key_value_heads"].is_null() {
@@ -312,7 +333,7 @@ fn parse_config(v: &Value) -> Result<Config> {
         "invalid attention dimensions"
     );
     let eps = v["rms_norm_eps"].as_f64().unwrap_or(1e-6) as f32;
-    let theta = v["rope_theta"].as_f64().unwrap_or(10000.) as f32;
+    let (theta, rope_inv_freq) = rope_parameters(v, head_dim)?;
     ensure!(
         eps.is_finite() && eps > 0. && theta.is_finite() && theta > 0.,
         "invalid RMSNorm epsilon or RoPE theta"
@@ -328,9 +349,118 @@ fn parse_config(v: &Value) -> Result<Config> {
         context: dimension(v, "max_position_embeddings")?,
         rms_norm_eps: eps,
         rope_theta: theta,
+        rope_inv_freq,
+        sliding_window,
     };
     product(&[c.layers, c.context, c.head_dim, c.kv_heads])?;
     Ok(c)
+}
+
+/// Static HF RoPE variants, computed before context limiting. Llama 3's original
+/// context comes from the checkpoint, never from the requested serving limit.
+fn rope_parameters(v: &Value, head: usize) -> Result<(f32, Option<Vec<f32>>)> {
+    ensure!(
+        v["rope_scaling"].is_null() || v["rope_parameters"].is_null(),
+        "ambiguous rope_scaling and rope_parameters"
+    );
+    let p = if v["rope_parameters"].is_null() {
+        &v["rope_scaling"]
+    } else {
+        &v["rope_parameters"]
+    };
+    ensure!(p.is_null() || p.is_object(), "invalid RoPE parameters");
+    if let Some(parameters) = p.as_object() {
+        for key in parameters.keys() {
+            ensure!(
+                matches!(
+                    key.as_str(),
+                    "rope_type"
+                        | "type"
+                        | "rope_theta"
+                        | "factor"
+                        | "partial_rotary_factor"
+                        | "low_freq_factor"
+                        | "high_freq_factor"
+                        | "original_max_position_embeddings"
+                ),
+                "unsupported RoPE parameter {key:?}"
+            );
+        }
+    }
+    let theta_value = if p["rope_theta"].is_null() {
+        &v["rope_theta"]
+    } else {
+        &p["rope_theta"]
+    };
+    let theta = if theta_value.is_null() {
+        10000.
+    } else {
+        theta_value.as_f64().context("invalid RoPE theta")? as f32
+    };
+    ensure!(theta.is_finite() && theta > 0., "invalid RoPE theta");
+    ensure!(
+        p["partial_rotary_factor"].is_null() || p["partial_rotary_factor"] == 1.0,
+        "partial RoPE is unsupported"
+    );
+    for key in ["rope_type", "type"] {
+        ensure!(p[key].is_null() || p[key].is_string(), "invalid RoPE {key}");
+    }
+    ensure!(
+        p["rope_type"].is_null() || p["type"].is_null() || p["rope_type"] == p["type"],
+        "conflicting RoPE types"
+    );
+    let kind = p["rope_type"]
+        .as_str()
+        .or_else(|| p["type"].as_str())
+        .unwrap_or("default");
+    if kind == "default" {
+        ensure!(
+            p.is_null() || p["factor"].is_null() || p["factor"] == 1.0,
+            "RoPE factor requires a supported rope_type"
+        );
+        return Ok((theta, None));
+    }
+    ensure!(
+        matches!(kind, "linear" | "llama3"),
+        "unsupported rope_type {kind:?}; supported: default, linear, llama3"
+    );
+    let positive = |key: &str| -> Result<f32> {
+        let n = p[key]
+            .as_f64()
+            .with_context(|| format!("missing RoPE {key}"))? as f32;
+        ensure!(n.is_finite() && n > 0., "invalid RoPE {key}");
+        Ok(n)
+    };
+    let factor = positive("factor")?;
+    ensure!(factor >= 1., "RoPE factor must be >= 1");
+    let mut frequencies: Vec<_> = (0..head / 2)
+        .map(|i| theta.powf((2 * i) as f32 / head as f32).recip())
+        .collect();
+    if kind == "linear" {
+        frequencies.iter_mut().for_each(|f| *f /= factor);
+    } else {
+        let low = positive("low_freq_factor")?;
+        let high = positive("high_freq_factor")?;
+        ensure!(
+            high > low,
+            "RoPE high_freq_factor must exceed low_freq_factor"
+        );
+        let original = dimension(p, "original_max_position_embeddings")? as f32;
+        for freq in &mut frequencies {
+            let wave = std::f32::consts::TAU / *freq;
+            if wave > original / low {
+                *freq /= factor;
+            } else if wave >= original / high {
+                let smooth = (original / wave - low) / (high - low);
+                *freq = (1. - smooth) * *freq / factor + smooth * *freq;
+            }
+        }
+    }
+    ensure!(
+        frequencies.iter().all(|f| f.is_finite() && *f > 0.),
+        "invalid scaled RoPE frequencies"
+    );
+    Ok((theta, Some(frequencies)))
 }
 
 fn dimension(v: &Value, key: &str) -> Result<usize> {
@@ -396,7 +526,7 @@ fn permute_qk(out: &mut [f32], input: &[f32], heads: usize, cols: usize) {
     }
 }
 
-fn layout(c: &Config, shared: bool, qk_norm: bool) -> Result<(Layout, usize)> {
+fn layout(c: &Config, shared: bool, qk_norm: bool, qkv_bias: bool) -> Result<(Layout, usize)> {
     let mut offset = 0usize;
     let mut take = |shape: &[usize]| -> Result<Range<usize>> {
         let start = offset;
@@ -435,6 +565,11 @@ fn layout(c: &Config, shared: bool, qk_norm: bool) -> Result<(Layout, usize)> {
     } else {
         None
     };
+    let qkv_bias = if qkv_bias {
+        Some(take(&[c.layers, qdim + 2 * kv])?)
+    } else {
+        None
+    };
     Ok((
         Layout {
             embedding,
@@ -451,6 +586,7 @@ fn layout(c: &Config, shared: bool, qk_norm: bool) -> Result<(Layout, usize)> {
             classifier,
             q_norm,
             k_norm,
+            qkv_bias,
         },
         offset,
     ))
@@ -497,6 +633,21 @@ fn targets(m: &Model) -> BTreeMap<String, Target> {
             );
         }
     }
+    if let Some(bias) = &l.qkv_bias {
+        for i in 0..c.layers {
+            let start = bias.start + i * (qdim + 2 * kv);
+            for (name, offset, size, heads) in [
+                ("q_proj", 0, qdim, Some(c.heads)),
+                ("k_proj", qdim, kv, Some(c.kv_heads)),
+                ("v_proj", qdim + kv, kv, None),
+            ] {
+                targets.insert(
+                    format!("model.layers.{i}.self_attn.{name}.bias"),
+                    (start + offset..start + offset + size, vec![size], heads),
+                );
+            }
+        }
+    }
     for (name, range) in [("q_norm", &l.q_norm), ("k_norm", &l.k_norm)] {
         if let Some(range) = range {
             for i in 0..c.layers {
@@ -529,6 +680,24 @@ mod tests {
             ("quantization_config", json!({"quant_method":"awq"})),
             ("rope_scaling", json!({"rope_type":"yarn"})),
             ("attention_bias", json!(true)),
+            (
+                "rope_parameters",
+                json!({"rope_type":"dynamic", "factor":2.0}),
+            ),
+            (
+                "rope_parameters",
+                json!({"full_attention":{"rope_type":"llama3"}}),
+            ),
+            ("rope_parameters", json!({"rope_type":12})),
+            (
+                "rope_parameters",
+                json!({"rope_type":"linear", "factor":0.0}),
+            ),
+            (
+                "rope_parameters",
+                json!({"rope_type":"llama3", "factor":8.0,
+                "low_freq_factor":4.0,"high_freq_factor":1.0,"original_max_position_embeddings":64}),
+            ),
             ("hidden_act", json!("gelu")),
             ("num_attention_heads", json!(0)),
             ("num_key_value_heads", json!(3)),

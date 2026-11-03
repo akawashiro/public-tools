@@ -2,6 +2,19 @@ use rust_vattention::{cuda::CudaSession, hub, text::TextTokenizer};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
+const FIXTURES: &[&str] = &[
+    "llama-f32",
+    "qwen3-f16",
+    "qwen3-bf16-sharded",
+    "qwen2-f16",
+    "qwen2-wide-f16",
+    "llama3-f32",
+    "llama-linear-f16",
+    "mistral-window-f16",
+    "mistral-wide-f16",
+    "mistral-full-f32",
+];
+
 fn fixture(name: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("tests/fixtures")
@@ -15,7 +28,7 @@ struct Expected {
 
 #[test]
 fn hf_logits_match_transformers() {
-    for name in ["llama-f32", "qwen3-f16", "qwen3-bf16-sharded"] {
+    for &name in FIXTURES {
         let path = fixture(name);
         let loaded = hub::load(path.to_str().unwrap(), "main", Path::new("unused")).unwrap();
         let reference: Expected =
@@ -51,7 +64,7 @@ fn hf_logits_match_transformers() {
 #[test]
 #[ignore = "requires a CUDA GPU, driver and NVRTC"]
 fn hf_cuda_logits_match_transformers() {
-    for name in ["llama-f32", "qwen3-f16", "qwen3-bf16-sharded"] {
+    for &name in FIXTURES {
         let path = fixture(name);
         let loaded = hub::load(path.to_str().unwrap(), "main", Path::new("unused")).unwrap();
         let reference: Expected =
@@ -122,14 +135,17 @@ fn rejects_corrupt_hf_checkpoints() {
 #[test]
 #[ignore = "requires CUDA and cuBLAS"]
 fn hf_batched_prefill_matches_transformers() {
-    for name in ["llama-f32", "qwen3-f16", "qwen3-bf16-sharded"] {
+    for &name in FIXTURES {
         let path = fixture(name);
         let loaded = hub::load(path.to_str().unwrap(), "main", Path::new("unused")).unwrap();
         let reference: Expected =
             serde_json::from_slice(&std::fs::read(path.join("expected.json")).unwrap()).unwrap();
         for fp16 in [false, true] {
             let mut gpu = CudaSession::new_with_fp16(&loaded.model, 0, 65536, fp16).unwrap();
-            for split in [1, 2, 4, 5] {
+            for split in [1, 2, 4, 5, 16, 256, 257]
+                .into_iter()
+                .filter(|&n| n <= reference.tokens.len())
+            {
                 gpu.reset_and_release().unwrap();
                 let actual = gpu.prefill(&reference.tokens[..split]).unwrap();
                 let err = actual

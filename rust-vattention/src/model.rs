@@ -15,6 +15,10 @@ pub struct Config {
     pub context: usize,
     pub rms_norm_eps: f32,
     pub rope_theta: f32,
+    /// Precomputed frequencies for static scaled RoPE; None uses the original formula.
+    pub rope_inv_freq: Option<Vec<f32>>,
+    /// Number of visible keys including the current token; None is full causal attention.
+    pub sliding_window: Option<usize>,
 }
 
 #[derive(Clone)]
@@ -33,6 +37,7 @@ pub(crate) struct Layout {
     pub(crate) classifier: Range<usize>,
     pub(crate) q_norm: Option<Range<usize>>,
     pub(crate) k_norm: Option<Range<usize>>,
+    pub(crate) qkv_bias: Option<Range<usize>>,
 }
 
 /// Weights are immutable; each session owns its KV cache and activation buffers.
@@ -85,6 +90,8 @@ impl Model {
             context,
             rms_norm_eps: 1e-5,
             rope_theta: 10000.,
+            rope_inv_freq: None,
+            sliding_window: None,
         };
         let kv = product(&[dim / heads, kv_heads])?;
         product(&[layers, context, kv])?;
@@ -149,6 +156,7 @@ impl Model {
                 classifier,
                 q_norm: None,
                 k_norm: None,
+                qkv_bias: None,
             },
         })
     }
@@ -268,6 +276,24 @@ impl<'a> Session<'a> {
                 &self.xb[..d],
                 &w[l.v.start + layer * kv * d..][..kv * d],
             );
+            if let Some(bias) = &l.qkv_bias {
+                let bias = &w[bias.start + layer * (qdim + 2 * kv)..][..qdim + 2 * kv];
+                for (x, b) in self.q.iter_mut().zip(&bias[..qdim]) {
+                    *x += b;
+                }
+                for (x, b) in self.keys[current..current + kv]
+                    .iter_mut()
+                    .zip(&bias[qdim..qdim + kv])
+                {
+                    *x += b;
+                }
+                for (x, b) in self.values[current..current + kv]
+                    .iter_mut()
+                    .zip(&bias[qdim + kv..])
+                {
+                    *x += b;
+                }
+            }
             if let (Some(qn), Some(kn)) = (&l.q_norm, &l.k_norm) {
                 head_norm(
                     &mut self.q,
@@ -282,23 +308,33 @@ impl<'a> Session<'a> {
                     c.rms_norm_eps,
                 );
             }
-            rope(&mut self.q, head, pos, c.rope_theta);
+            rope(
+                &mut self.q,
+                head,
+                pos,
+                c.rope_theta,
+                c.rope_inv_freq.as_deref(),
+            );
             rope(
                 &mut self.keys[current..current + kv],
                 head,
                 pos,
                 c.rope_theta,
+                c.rope_inv_freq.as_deref(),
             );
             self.xb.fill(0.);
+            let first_key = c
+                .sliding_window
+                .map_or(0, |window| (pos + 1).saturating_sub(window));
             for h in 0..c.heads {
                 let kh = h / (c.heads / c.kv_heads) * head;
                 let query = &self.q[h * head..(h + 1) * head];
-                for t in 0..=pos {
+                for t in first_key..=pos {
                     let key = &self.keys[cache + t * kv + kh..][..head];
                     self.scores[t] = dot(query, key) / (head as f32).sqrt();
                 }
-                softmax(&mut self.scores[..=pos]);
-                for t in 0..=pos {
+                softmax(&mut self.scores[first_key..=pos]);
+                for t in first_key..=pos {
                     let value = &self.values[cache + t * kv + kh..][..head];
                     for (out, v) in self.xb[h * head..(h + 1) * head].iter_mut().zip(value) {
                         *out += self.scores[t] * v;
@@ -381,9 +417,12 @@ fn rmsnorm(out: &mut [f32], input: &[f32], weights: &[f32], eps: f32) {
     }
 }
 
-fn rope(vector: &mut [f32], head: usize, position: usize, theta: f32) {
+fn rope(vector: &mut [f32], head: usize, position: usize, theta: f32, inv_freq: Option<&[f32]>) {
     for (i, pair) in vector.as_chunks_mut::<2>().0.iter_mut().enumerate() {
-        let angle = position as f32 / theta.powf((i * 2 % head) as f32 / head as f32);
+        let angle = inv_freq.map_or_else(
+            || position as f32 / theta.powf((i * 2 % head) as f32 / head as f32),
+            |freq| position as f32 * freq[i % (head / 2)],
+        );
         let (sin, cos) = angle.sin_cos();
         let (a, b) = (pair[0], pair[1]);
         pair[0] = a * cos - b * sin;
@@ -408,7 +447,7 @@ mod tests {
     fn rope_preserves_norm() {
         let mut v = vec![1., 2., 3., 4., 5., 6., 7., 8.];
         let before = dot(&v, &v);
-        rope(&mut v, 4, 7, 10000.);
+        rope(&mut v, 4, 7, 10000., None);
         assert!((dot(&v, &v) - before).abs() < 1e-4);
     }
 }

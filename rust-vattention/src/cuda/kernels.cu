@@ -81,7 +81,7 @@ extern "C" __global__ void head_rmsnorm(float* x, const W* w, U head, U eps) {
 extern "C" __global__ void rope(float* x, U n, U head, U pos, U theta) {
     U i = (blockIdx.x*blockDim.x+threadIdx.x)*2;
     if (i>=n) return;
-    float angle = float(pos)/powf(__uint_as_float((unsigned)theta), float(i%head)/float(head));
+    float angle = rope_angle(i,head,pos,__uint_as_float((unsigned)theta));
     float s = sinf(angle), c = cosf(angle), a = x[i], b = x[i+1];
     x[i] = a*c-b*s; x[i+1] = a*s+b*c;
 }
@@ -96,6 +96,7 @@ extern "C" __global__ void swiglu(float* h, const float* gate, U n) {
 extern "C" __global__ void scores(float* scores, const float* q, const float* keys,
                                   U head, U kv, U kv_mul, U length) {
     U h = blockIdx.x/length, t = blockIdx.x%length;
+    if (t<attention_first(length)) { if (threadIdx.x==0) scores[h*length+t]=-__int_as_float(0x7f800000); return; }
     U key = t*kv+(h/kv_mul)*head;
     float sum = 0;
     for (U i=threadIdx.x; i<head; i+=blockDim.x) sum += q[h*head+i]*keys[key+i];
@@ -124,7 +125,7 @@ extern "C" __global__ void attention_values(float* out, const float* scores, con
     if (i>=dim) return;
     U h = i/head, j = i%head, offset = (h/kv_mul)*head+j;
     float sum = 0;
-    for (U t=0; t<length; ++t) sum += scores[h*length+t]*values[t*kv+offset];
+    for (U t=attention_first(length); t<length; ++t) sum += scores[h*length+t]*values[t*kv+offset];
     out[i] = sum;
 }
 
@@ -170,7 +171,7 @@ extern "C" __global__ void batch_attention(float* out, const float* q, const flo
     if (threadIdx.x<head) query_vec[threadIdx.x]=q[(query*heads+h)*head+threadIdx.x];
     __syncthreads();
     float m=-__int_as_float(0x7f800000), denom=0, acc=0;
-    for (U start=0; start<length; start+=256) {
+    for (U start=attention_first(length); start<length; start+=256) {
         U count=min((U)256,length-start);
         for (U j=warp;j<256;j+=8) {
             float dot=0;
@@ -241,4 +242,9 @@ extern "C" __global__ void argmax(const float* values, const unsigned* ids, U co
         }
         if (lane==0) { out_values[blockIdx.x]=best; out_ids[blockIdx.x]=bad ? 0xffffffff : id; }
     }
+}
+
+extern "C" __global__ void add_bias(float* x, const W* bias, U n) {
+    U i=blockIdx.x*blockDim.x+threadIdx.x;
+    if (i<n) x[i]+=load_weight(bias,i);
 }

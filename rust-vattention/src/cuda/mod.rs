@@ -1,6 +1,7 @@
 //! GPU transformer and vAttention-style KV allocation using CUDA Driver VMM.
 mod attention;
 mod decode;
+mod parameters;
 mod prefill;
 mod sampling;
 mod vmm;
@@ -168,7 +169,8 @@ impl CudaSession {
         }
         let ptx = compile_ptx_with_opts(
             format!(
-                "{}\n{}\n{}\n{}\n{}\n{}",
+                "{}\n{}\n{}\n{}\n{}\n{}\n{}",
+                parameters::prelude(&model.config),
                 include_str!("kernels.cu"),
                 include_str!("packed.cu"),
                 include_str!("sampling.cu"),
@@ -183,6 +185,7 @@ impl CudaSession {
         let mut functions = HashMap::new();
         for name in [
             "embedding",
+            "add_bias",
             "set_step",
             "argmax",
             "mma_causal_attention",
@@ -448,6 +451,20 @@ impl CudaSession {
                 d,
                 kv,
             )?;
+            if let Some(bias) = &l.qkv_bias {
+                let base = bias.start + layer * (qdim + 2 * kv);
+                for (out, offset, count) in [
+                    (self.q.ptr, 0, qdim),
+                    (current_key, qdim, kv),
+                    (current_value, qdim + kv, kv),
+                ] {
+                    self.launch(
+                        "add_bias",
+                        &[out, self.weight(base + offset), count as u64],
+                        count.div_ceil(256),
+                    )?;
+                }
+            }
             if let (Some(qn), Some(kn)) = (&l.q_norm, &l.k_norm) {
                 self.launch(
                     "head_rmsnorm",

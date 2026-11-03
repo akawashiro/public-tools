@@ -8,3 +8,17 @@ RMSNorm epsilon, tied/untied classifiers, and single/sharded safetensors.
 Regenerate with `target/bench-venv/bin/python scripts/generate-hf-fixtures.py`.
 `cargo test --locked` verifies the CPU path. GPU comparison additionally runs with
 `LD_LIBRARY_PATH=/usr/local/cuda/lib64 cargo test --locked --test hub -- --ignored`.
+
+Additional model-coverage fixtures exercise nonzero Qwen2 Q/K/V biases (including
+RoPE permutation of the Q/K biases), Llama 3 frequency bands and interpolation,
+linear RoPE, old `rope_scaling` and new `rope_parameters` configuration formats,
+and Mistral full/sliding-window attention. The windowed head_dim=128 fixture has
+273 reference tokens with a five-token window: tests cover online, fused MMA,
+cuBLAS prefill, graph bucket transitions and split decode at the 256-token
+boundary. Wide head_dim=264 fixtures exercise the legacy CUDA fallback with
+biases and window masking. Existing fixtures remain unchanged.
+
+The new projections use stronger deterministic random weights and nonconstant
+biases so incorrect scaling, permutation or masking affects the logits. Every
+reference is computed independently by Transformers eager attention, without
+using the Rust implementation.

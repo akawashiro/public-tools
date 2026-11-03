@@ -1,6 +1,6 @@
 // Unpack a single QKV projection directly into Q and stable VMM cache addresses,
 // combining optional Q/K head normalization with RoPE. V is copied unmodified.
-extern "C" __global__ void qkv_transform(float* out_q, const float* qkv,
+extern "C" __global__ void qkv_transform(float* out_q, const float* qkv, const W* bias,
     float* keys, float* values, const W* qnorm, const W* knorm,
     U head, U heads, U kv_heads, U eps, U theta, U pos) {
     if (pos==~(U)0) pos=step_pos;
@@ -8,7 +8,7 @@ extern "C" __global__ void qkv_transform(float* out_q, const float* qkv,
     const float* source=qkv+(token*count+h)*head;
     if (h>=heads+kv_heads) {
         float* dest=values+(pos+token)*kv_heads*head+(h-heads-kv_heads)*head;
-        for (U i=threadIdx.x;i<head;i+=blockDim.x) dest[i]=source[i];
+        for (U i=threadIdx.x;i<head;i+=blockDim.x) dest[i]=source[i]+(bias ? load_weight(bias,h*head+i) : 0.f);
         return;
     }
     bool key=h>=heads;
@@ -17,13 +17,13 @@ extern "C" __global__ void qkv_transform(float* out_q, const float* qkv,
     float scale=1.f;
     if (norm) {
         float sum=0;
-        for (U i=threadIdx.x;i<head;i+=blockDim.x) sum+=source[i]*source[i];
+        for (U i=threadIdx.x;i<head;i+=blockDim.x) { float x=source[i]+(bias ? load_weight(bias,h*head+i) : 0.f); sum+=x*x; }
         scale=rsqrtf(sum_block(sum)/float(head)+__uint_as_float((unsigned)eps));
     }
     for (U i=threadIdx.x*2;i<head;i+=blockDim.x*2) {
-        float a=source[i]*scale*(norm ? load_weight(norm,i) : 1.f);
-        float b=source[i+1]*scale*(norm ? load_weight(norm,i+1) : 1.f);
-        float angle=float(pos+token)/powf(__uint_as_float((unsigned)theta),float(i)/float(head));
+        float a=(source[i]+(bias ? load_weight(bias,h*head+i) : 0.f))*scale*(norm ? load_weight(norm,i) : 1.f);
+        float b=(source[i+1]+(bias ? load_weight(bias,h*head+i+1) : 0.f))*scale*(norm ? load_weight(norm,i+1) : 1.f);
+        float angle=rope_angle(i,head,pos+token,__uint_as_float((unsigned)theta));
         float sn=sinf(angle),cs=cosf(angle);
         dest[i]=a*cs-b*sn; dest[i+1]=a*sn+b*cs;
     }

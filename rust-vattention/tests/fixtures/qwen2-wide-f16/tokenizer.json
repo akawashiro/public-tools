@@ -1,0 +1,75 @@
+{
+  "version": "1.0",
+  "truncation": null,
+  "padding": null,
+  "added_tokens": [],
+  "normalizer": null,
+  "pre_tokenizer": {
+    "type": "Whitespace"
+  },
+  "post_processor": {
+    "type": "TemplateProcessing",
+    "single": [
+      {
+        "SpecialToken": {
+          "id": "t5",
+          "type_id": 0
+        }
+      },
+      {
+        "Sequence": {
+          "id": "A",
+          "type_id": 0
+        }
+      }
+    ],
+    "pair": [
+      {
+        "Sequence": {
+          "id": "A",
+          "type_id": 0
+        }
+      },
+      {
+        "Sequence": {
+          "id": "B",
+          "type_id": 1
+        }
+      }
+    ],
+    "special_tokens": {
+      "t5": {
+        "id": "t5",
+        "ids": [
+          5
+        ],
+        "tokens": [
+          "t5"
+        ]
+      }
+    }
+  },
+  "decoder": null,
+  "model": {
+    "type": "WordLevel",
+    "vocab": {
+      "t0": 0,
+      "t1": 1,
+      "t2": 2,
+      "t3": 3,
+      "t4": 4,
+      "t5": 5,
+      "t6": 6,
+      "t7": 7,
+      "t8": 8,
+      "t9": 9,
+      "t10": 10,
+      "t11": 11,
+      "t12": 12,
+      "t13": 13,
+      "t14": 14,
+      "t15": 15
+    },
+    "unk_token": "t0"
+  }
+}

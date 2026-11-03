@@ -28,7 +28,7 @@ extern "C" __global__ void mma_causal_attention(unsigned short* out,const float*
     }
     if (threadIdx.x<16) {maximum[threadIdx.x]=-__int_as_float(0x7f800000);denom[threadIdx.x]=0.f;}
     float acc[4][4]={{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-    for (U start=0;start<end;start+=32) {
+    for (U start=(attention_first(position+qstart+1)/32)*32;start<end;start+=32) {
         for (U i=threadIdx.x;i<32*128;i+=128) {
             U row=i/128,col=i%128,t=start+row;
             k[row*132+col]=tf32_bits(t<end ? keys[t*kvstride+kh*128+col] : 0.f);
@@ -51,13 +51,18 @@ extern "C" __global__ void mma_causal_attention(unsigned short* out,const float*
         __syncthreads();
 #pragma unroll
         for (unsigned row=warp;row<16;row+=4) {
-            bool valid=qstart+row<tokens && start+lane<=position+qstart+row && start+lane<end;
+            bool valid=qstart+row<tokens && start+lane<=position+qstart+row && start+lane<end && start+lane>=attention_first(position+qstart+row+1);
             float score=valid ? __uint_as_float(p[row*36+lane]) : -__int_as_float(0x7f800000);
             float tile_max=score;
             for (int d=16;d;d/=2) tile_max=fmaxf(tile_max,__shfl_down_sync(0xffffffff,tile_max,d));
             tile_max=__shfl_sync(0xffffffff,tile_max,0);
             float next_max=fmaxf(maximum[row],tile_max);
+#if WINDOW_ATTENTION
+            // A sliding window can mask a whole tile for some query rows.
+            float scale=qstart+row<tokens && isfinite(next_max) ? expf(maximum[row]-next_max) : 0.f;
+#else
             float scale=qstart+row<tokens ? expf(maximum[row]-next_max) : 0.f;
+#endif
             float prob=valid ? expf(score-next_max) : 0.f;
             float sum=prob;
             for (int d=16;d;d/=2) sum+=__shfl_down_sync(0xffffffff,sum,d);

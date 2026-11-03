@@ -198,6 +198,9 @@ impl CudaSession {
                 &[
                     p.q.ptr,
                     p.qkv.ptr,
+                    l.qkv_bias
+                        .as_ref()
+                        .map_or(0, |r| self.weight(r.start + layer * (q + 2 * kv))),
                     self.keys[layer].address,
                     self.values[layer].address,
                     qn,
